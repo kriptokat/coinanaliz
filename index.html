@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Coin Performans Tablosu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e0e0;
+      padding: 10px;
+      text-align: center;
+      overflow-x: hidden;
+    }
+    .table-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .table-wrapper {
+      background: rgba(15, 25, 35, 0.95);
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00ffcc66, inset 0 0 10px rgba(0, 255, 195, 0.2);
+      max-width: 1000px;
+      width: 100%;
+      overflow-x: auto;
+      max-height: 500px;
+      border: 1px solid #00ffc3;
+      position: relative;
+    }
+    .table-wrapper::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(0, 255, 195, 0.05) 0%,
+        rgba(0, 255, 195, 0) 20%,
+        rgba(0, 255, 195, 0) 80%,
+        rgba(0, 255, 195, 0.05) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+      font-size: 13px;
+    }
+    /* Sütun genişlikleri */
+    thead th:nth-child(1), tbody td:nth-child(1) { width: 40px; }  /* # */
+    thead th:nth-child(2), tbody td:nth-child(2) { width: 90px; } /* Coin */
+    thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; } /* Aylık Dip Fiyatı */
+    thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; } /* Güncel Fiyat */
+    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; } /* Artış % */
+    thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; } /* 24s Değişim */
+    thead th:nth-child(7), tbody td:nth-child(7) { width: 60px; }  /* A-RSI */
+    thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }  /* H-RSI */
+    thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }  /* G-RSI */
+
+    /* Narrow coin column */
+    thead th:nth-child(2), tbody td:nth-child(2) {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    thead th {
+      background: #00ffc3;
+      color: #0f2027;
+      font-size: 14px;
+      font-weight: bold;
+      font-family: 'Roboto Mono', monospace;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      padding: 8px 5px;
+      border-right: 1px solid #088f8f;
+      cursor: pointer;
+    }
+    thead th:first-child { cursor: default; }
+    thead th:last-child { border-right: none; }
+    tbody td {
+      padding: 8px 10px;
+      text-align: center;
+      border: 1px solid #00ffc322;
+      font-size: 13px;
+    }
+    td.green { color: #00ff00; font-weight: bold; text-shadow: 0 0 5px rgba(0, 255, 0, 0.3); }
+    td.red   { color: #ff4d4d; font-weight: bold; text-shadow: 0 0 5px rgba(255, 77, 77, 0.3); }
+    td.coin-name {
+      font-weight: bold;
+      text-align: left;
+      padding-left: 8px;
+      color: #ffffff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      position: relative;
+    }
+    /* Link stilleri eklendi */
+    td.coin-name a {
+      color: inherit;
+      text-decoration: none;
+    }
+    td.coin-name a:hover {
+      text-decoration: underline;
+      color: #00ffc3;
+    }
+    .chart-emoji {
+      float: right;
+      margin-left: 5px;
+      text-decoration: none !important;
+    }
+    .chart-emoji:hover {
+      color: #00ffc3 !important;
+      text-decoration: none !important;
+    }
+    /* Search input narrower & smaller */
+    .search-input {
+      margin-top: 2px;
+      padding: 3px;
+      font-size: 11px;
+      width: 70px;
+      border: 1px solid #00ffc3;
+      border-radius: 3px;
+      background: #1c2c3c;
+      color: #e0e0e0;
+    }
+    .dip-input {
+      margin-top: 3px;
+      padding: 4px;
+      font-size: 12px;
+      width: 40px;
+      border: 1px solid #00ffc3;
+      border-radius: 3px;
+      background: #1c2c3c;
+      color: #e0e0e0;
+    }
+    h2 {
+      color: #00ffc3; 
+      text-shadow: 0 0 5px #00ffc3;
+      font-size: 20px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    h2::after {
+      content: "";
+      display: block;
+      width: 100px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #00ffc3, transparent);
+      margin: 5px auto;
+    }
+    @media (max-width: 768px) { table { font-size: 12px; } }
+  </style>
+</head>
+<body>
+
+<h2>🚀 Coin Performans Tablosu</h2>
+
+<div class="table-container">
+  <div class="table-wrapper">
+    <table id="coinTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th onclick="sortTable(1)">
+            Coin<br>
+            <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
+          </th>
+          <th onclick="sortTable(2)">
+            Aylık Dip Fiyatı<br>
+            <input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" onchange="updateTable()">
+          </th>
+          <th onclick="sortTable(3)">Güncel Fiyat</th>
+          <th onclick="sortTable(4)">Artış<br>%</th>
+          <th onclick="sortTable(5)">24s Değişim</th>
+          <th onclick="sortTable(6)">A‑RSI</th>
+          <th onclick="sortTable(7)">H‑RSI</th>
+          <th onclick="sortTable(8)">G‑RSI</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function formatNum(val, decimals) {
+    return val.toFixed(decimals).replace(/\.?(0)+$/, '');
+  }
+
+  const coinList = ["1000CAT",
+"1000CHEEMS",
+"1000SATS",
+"1INCH",
+"1MBABYDOGE",
+"AAVE",
+"ACA",
+"ACE",
+"ACH",
+"ACM",
+"ACT",
+"ACX",
+"ADA",
+"ADX",
+"AEVO",
+"AGLD",
+"AI",
+"AIXBT",
+"ALCX",
+"ALGO",
+"ALICE",
+"ALPHA",
+"ALPINE",
+"ALT",
+"AMP",
+"ANIME",
+"ANKR",
+"APE",
+"API3",
+"APT",
+"AR",
+"ARB",
+"ARDR",
+"ARK",
+"ARKM",
+"ARPA",
+"ASR",
+"ASTR",
+"ATA",
+"ATM",
+"ATOM",
+"AUCTION",
+"AUDIO",
+"AVA",
+"AVAX",
+"AXL",
+"AXS",
+"BABY",
+"BAKE",
+"BANANA",
+"BANANAS31",
+"BAND",
+"BAR",
+"BAT",
+"BB",
+"BCH",
+"BEAMX",
+"BEL",
+"BERA",
+"BICO",
+"BIFI",
+"BIGTIME",
+"BIO",
+"BLUR",
+"BMT",
+"BNB",
+"BNSOL",
+"BNT",
+"BOME",
+"BONK",
+"BROCCOLI714",
+"BTC",
+"BTTC",
+"C98",
+"CAKE",
+"CATI",
+"CELO",
+"CELR",
+"CETUS",
+"CFX",
+"CGPT",
+"CHR",
+"CHZ",
+"CITY",
+"CKB",
+"COOKIE",
+"COS",
+"COTI",
+"COW",
+"CRV",
+"CTK",
+"CTSI",
+"CVC",
+"CVX",
+"CYBER",
+"D",
+"DASH",
+"DATA",
+"DCR",
+"DEGO",
+"DENT",
+"DEXE",
+"DF",
+"DGB",
+"DIA",
+"DODO",
+"DOGS",
+"DUSK",
+"DYDX",
+"DYM",
+"EDU",
+"EGLD",
+"EIGEN",
+"ENA",
+"ENJ",
+"ENS",
+"EPIC",
+"ETC",
+"ETH",
+"ETHFI",
+"FARM",
+"FET",
+"FIDA",
+"FIL",
+"FIO",
+"FIS",
+"FLM",
+"FLOKI",
+"FLOW",
+"FLUX",
+"FORM",
+"FORTH",
+"FTT",
+"FUN",
+"FXS",
+"G",
+"GALA",
+"GAS",
+"GHST",
+"GLM",
+"GLMR",
+"GMX",
+"GNO",
+"GNS",
+"GPS",
+"GRT",
+"GTC",
+"GUN",
+"HBAR",
+"HEI",
+"HFT",
+"HIFI",
+"HIGH",
+"HIVE",
+"HMSTR",
+"HOOK",
+"HOT",
+"HYPER",
+"ICP",
+"ID",
+"IDEX",
+"ILV",
+"IMX",
+"INIT",
+"INJ",
+"IO",
+"IOST",
+"IOTA",
+"IOTX",
+"IQ",
+"JASMY",
+"JOE",
+"JST",
+"JTO",
+"JUP",
+"JUV",
+"KAIA",
+"KAITO",
+"KAVA",
+"KDA",
+"KERNEL",
+"KMD",
+"KNC",
+"KSM",
+"LAYER",
+"LAZIO",
+"LDO",
+"LEVER",
+"LINK",
+"LISTA",
+"LOKA",
+"LPT",
+"LQTY",
+"LRC",
+"LSK",
+"LTC",
+"LTO",
+"LUMIA",
+"MAGIC",
+"MANA",
+"MANTA",
+"MASK",
+"MAV",
+"MBL",
+"MBOX",
+"MDT",
+"ME",
+"MEME",
+"METIS",
+"MINA",
+"MKR",
+"MLN",
+"MOVE",
+"MOVR",
+"MTL",
+"MUBARAK",
+"NEAR",
+"NEIRO",
+"NEO",
+"NEXO",
+"NFP",
+"NIL",
+"NKN",
+"NMR",
+"NOT",
+"NTRN",
+"OG",
+"OGN",
+"OMNI",
+"ONDO",
+"ONE",
+"ONG",
+"ONT",
+"OP",
+"ORCA",
+"ORDI",
+"OSMO",
+"OXT",
+"PARTI",
+"PENDLE",
+"PENGU",
+"PEOPLE",
+"PEPE",
+"PERP",
+"PHA",
+"PHB",
+"PIVX",
+"PIXEL",
+"PNUT",
+"POL",
+"POLYX",
+"POND",
+"PORTAL",
+"PORTO",
+"POWR",
+"PROM",
+"PSG",
+"PUNDIX",
+"PYR",
+"PYTH",
+"QI",
+"QKC",
+"QNT",
+"QTUM",
+"QUICK",
+"RAD",
+"RARE",
+"RAY",
+"RDNT",
+"RED",
+"REI",
+"RENDER",
+"REQ",
+"REZ",
+"RIF",
+"RLC",
+"RONIN",
+"ROSE",
+"RPL",
+"RSR",
+"RUNE",
+"RVN",
+"S",
+"SAGA",
+"SAND",
+"SANTOS",
+"SC",
+"SCR",
+"SCRT",
+"SEI",
+"SFP",
+"SHELL",
+"SHIB",
+"SIGN",
+"SKL",
+"SLF",
+"SNX",
+"SOL",
+"SOLV",
+"SPELL",
+"SSV",
+"STEEM",
+"STG",
+"STORJ",
+"STPT",
+"STO",
+"STRAX",
+"STRK",
+"STX",
+"SUI",
+"SUN",
+"SUPER",
+"SUSHI",
+"SXP",
+"SYS",
+"T",
+"TAO",
+"TFUEL",
+"THE",
+"THETA",
+"TIA",
+"TKO",
+"TLM",
+"TNSR",
+"TON",
+"TRB",
+"TRU",
+"TRUMP",
+"TST",
+"TURBO",
+"TUT",
+"TWT",
+"UMA",
+"UNI",
+"USUAL",
+"UTK",
+"VANA",
+"VANRY",
+"VELODROME",
+"VET",
+"VIRTUAL",
+"VOXEL",
+"VTHO",
+"W",
+"WAN",
+"WAXP",
+"WCT",
+"WIF",
+"WIN",
+"WLD",
+"WOO",
+"XAI",
+"XEC",
+"XLM",
+"XNO",
+"XRP",
+"XTZ",
+"XVG",
+"XVS",
+"YFI",
+"YGG",
+"ZEC",
+"ZEN",
+"ZIL",
+"ZK",
+"ZRO",
+"ZRX"];
+  const tableBody = document.querySelector('#coinTable tbody');
+  let sortDirection = Array(9).fill(true);
+  const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
+  const rsiHistory = {};
+
+  function computeRSIFromArray(closes) {
+    if (closes.length <= RSI_PERIOD) return NaN;
+    let gain=0, loss=0;
+    for (let i=1;i<=RSI_PERIOD;i++){const d=closes[i]-closes[i-1];gain+=d>0?d:0;loss+=d<0?-d:0;}
+    let avgG=gain/RSI_PERIOD, avgL=loss/RSI_PERIOD;
+    for (let i=RSI_PERIOD+1;i<closes.length;i++){const d=closes[i]-closes[i-1],g=d>0?d:0,l=d<0?-d:0;avgG=(avgG*(RSI_PERIOD-1)+g)/RSI_PERIOD;avgL=(avgL*(RSI_PERIOD-1)+l)/RSI_PERIOD;}
+    if(avgL===0) return 100; const rs=avgG/avgL; return 100-(100/(1+rs));
+  }
+
+  function updateTable() {
+    const months = Math.max(1, parseInt(dipMonths.value)||1);
+    fetch('https://api.binance.com/api/v3/ticker/24hr').then(r=>r.json()).then(data=>{
+      const map24 = new Map(data.map(d=>[d.symbol,d]));
+      return Promise.all(coinList.map(name=>
+        fetch(`https://api.binance.com/api/v3/klines?symbol=${name}USDT&interval=1M&limit=${months+1}`).then(r=>r.json()).then(klines=>{
+          klines.pop(); const dipArr=klines.map(k=>+k[3]); const dip=dipArr.length?Math.min(...dipArr):NaN;
+          const o=map24.get(name+'USDT')||{};
+          return {name,dip,currentPrice:+o.lastPrice||NaN,priceChange:+o.priceChangePercent||NaN};
+        })
+      ));
+    }).then(list=>{renderTable(list);setupWebSocket();});
+  }
+
+  function renderTable(data) {
+    tableBody.innerHTML='';
+    data.forEach((c,i)=>{
+      const row=document.createElement('tr');
+      row.innerHTML=`
+        <td>${i+1}</td>
+        <td class="coin-name">
+          <a href="https://www.binance.com/en-TR/trade/${c.name}_USDT" target="_blank">${c.name}</a>
+          <a href="https://tr.tradingview.com/chart/8tydse0K/?symbol=BINANCE%3A${c.name}USDT" target="_blank" class="chart-emoji">📈</a>
+        </td>
+        <td>${isNaN(c.dip)?'0':formatNum(c.dip,6)}</td>
+        <td>${isNaN(c.currentPrice)?'0':formatNum(c.currentPrice,7)}</td>
+        <td class="${c.dip&&((c.currentPrice-c.dip)/c.dip*100)>0?'green':'red'}">
+          ${!isNaN(c.dip)?formatNum((c.currentPrice-c.dip)/c.dip*100,2)+'%':'0'}
+        </td>
+        <td class="${c.priceChange>0?'green':'red'}">
+          ${isNaN(c.priceChange)?'0':formatNum(c.priceChange,2)+'%'}
+        </td>
+        <td class="a-rsi">…</td>
+        <td class="h-rsi">…</td>
+        <td class="g-rsi">…</td>
+      `;
+      tableBody.appendChild(row);
+      initRSIHistory(c.name,'1M',row.querySelector('.a-rsi'));
+      initRSIHistory(c.name,'1w',row.querySelector('.h-rsi'));
+      initRSIHistory(c.name,'1d',row.querySelector('.g-rsi'));
+    });
+  }
+
+  function initRSIHistory(symbol,interval,cell){
+    const lim=interval==='1d'?RSI_HIST_DAILY:RSI_HIST_OTHER;
+    fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}USDT&interval=${interval}&limit=${lim}`)
+      .then(r=>r.json()).then(klines=>{
+        if(interval==='1d'){const last=klines.at(-1); if(Date.now()<last[0]+86400000) klines.pop();} else klines.pop();
+        const closes=klines.map(k=>+k[4]);
+        rsiHistory[symbol]=rsiHistory[symbol]||{}; rsiHistory[symbol][interval]=closes;
+        const val=computeRSIFromArray(closes);
+        cell.textContent=isNaN(val)?'0':formatNum(val,2);
+        cell.classList.remove('green','red'); if(val>=70)cell.classList.add('green'); else if(val<=30)cell.classList.add('red');
+      }).catch(_=>cell.textContent='0');
+  }
+
+  function setupWebSocket(){
+    const ws=new WebSocket(`wss://stream.binance.com:9443/stream?streams=${coinList.map(n=>n.toLowerCase()+'usdt@ticker').join('/')}`);
+    const rowMap={}; 
+    tableBody.querySelectorAll('tr').forEach(r=>{
+      const coinName = r.cells[1].querySelector('a').textContent; // Düzeltme burada
+      rowMap[coinName]=r;
+    });
+    
+    ws.onmessage=e=>{
+      const d=JSON.parse(e.data).data; 
+      const nm=d.s.replace('USDT',''); 
+      const row=rowMap[nm]; 
+      if(!row)return;
+      
+      const price=+d.c, change=+d.P;
+      row.cells[3].textContent=formatNum(price,7);
+      const dip=parseFloat(row.cells[2].textContent)||NaN;
+      const gr=dip?((price-dip)/dip*100):NaN;
+      row.cells[4].textContent=isNaN(gr)?'0':formatNum(gr,2)+'%'; 
+      row.cells[4].className=gr>=0?'green':'red';
+      row.cells[5].textContent=formatNum(change,2)+'%'; 
+      row.cells[5].className=change>=0?'green':'red';
+      
+      ['1M','1w','1d'].forEach((int,idx)=>{
+        const hist=rsiHistory[nm]&&rsiHistory[nm][int]; 
+        if(!hist) return;
+        const arr=hist.slice(); 
+        arr[arr.length-1]=price; 
+        const val=computeRSIFromArray(arr);
+        const cls=idx===0?'.a-rsi':idx===1?'.h-rsi':'.g-rsi'; 
+        const cell=row.querySelector(cls);
+        cell.textContent=isNaN(val)?'0':formatNum(val,2);
+        cell.classList.remove('green','red'); 
+        if(val>=70)cell.classList.add('green'); 
+        else if(val<=30)cell.classList.add('red');
+      });
+    };
+    ws.onclose=()=>setTimeout(setupWebSocket,5000);
+  }
+
+  function searchCoin(){
+    const t=coinSearch.value.toLowerCase(); 
+    tableBody.querySelectorAll('tr').forEach(r=>{
+      const coinName = r.cells[1].querySelector('a').textContent.toLowerCase();
+      r.style.display=coinName.includes(t)?'':'none';
+    });
+  }
+
+  function sortTable(col){
+    const rows=Array.from(tableBody.querySelectorAll('tr'));
+    const dir=sortDirection[col]?1:-1;
+    rows.sort((a,b)=>{
+      let x=a.cells[col].textContent.trim();
+      let y=b.cells[col].textContent.trim();
+      if(col>=2){
+        x=parseFloat(x)||0;
+        y=parseFloat(y)||0;
+      }
+      return x>y?dir:x<y?-dir:0;
+    });
+    rows.forEach((r,i)=>{
+      r.cells[0].textContent=i+1;
+      tableBody.appendChild(r);
+    });
+    sortDirection[col]=!sortDirection[col];
+  }
+
+  dipMonths.addEventListener('click',e=>e.stopPropagation()); 
+  updateTable();
+</script>
+
+</body>
+</html>
