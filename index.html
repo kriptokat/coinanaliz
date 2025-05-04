@@ -59,7 +59,7 @@
     thead th:nth-child(2), tbody td:nth-child(2) { width: 90px; } /* Coin */
     thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; } /* Aylık Dip Fiyatı */
     thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; } /* Güncel Fiyat */
-    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; } /* Artış % */
+    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; } /* Dipten Artış % */
     thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; } /* 24s Değişim */
     thead th:nth-child(7), tbody td:nth-child(7) { width: 60px; }  /* A-RSI */
     thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }  /* H-RSI */
@@ -179,7 +179,7 @@
             <input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" onchange="updateTable()">
           </th>
           <th onclick="sortTable(3)">Güncel Fiyat</th>
-          <th onclick="sortTable(4)">Artış<br>%</th>
+          <th onclick="sortTable(4)">Dipten Artış<br>%</th>
           <th onclick="sortTable(5)">24s Değişim</th>
           <th onclick="sortTable(6)">A‑RSI</th>
           <th onclick="sortTable(7)">H‑RSI</th>
