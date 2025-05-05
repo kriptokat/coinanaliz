@@ -91,6 +91,7 @@
       text-align: center;
       border: 1px solid #00ffc322;
       font-size: 13px;
+      transition: color 0.1s ease; /* Renk geçiş efekti eklendi */
     }
     td.green { color: #00ff00; font-weight: bold; text-shadow: 0 0 5px rgba(0, 255, 0, 0.3); }
     td.red   { color: #ff4d4d; font-weight: bold; text-shadow: 0 0 5px rgba(255, 77, 77, 0.3); }
@@ -175,9 +176,9 @@
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
           <th onclick="sortTable(2)">
-            <input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" onchange="updateTable()">
+<input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" onchange="updateTable()">
             Aylık Dip Fiyatı<br>
-          </th>
+                      </th>
           <th onclick="sortTable(3)">Güncel Fiyat</th>
           <th onclick="sortTable(4)">Dipten Artış<br>%</th>
           <th onclick="sortTable(5)">24s Değişim</th>
@@ -567,6 +568,7 @@
   let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
   const rsiHistory = {};
+  const previousPrices = {}; // Önceki fiyatları saklamak için eklendi
 
   function computeRSIFromArray(closes) {
     if (closes.length <= RSI_PERIOD) return NaN;
@@ -637,7 +639,7 @@
     const ws=new WebSocket(`wss://stream.binance.com:9443/stream?streams=${coinList.map(n=>n.toLowerCase()+'usdt@ticker').join('/')}`);
     const rowMap={}; 
     tableBody.querySelectorAll('tr').forEach(r=>{
-      const coinName = r.cells[1].querySelector('a').textContent; // Düzeltme burada
+      const coinName = r.cells[1].querySelector('a').textContent;
       rowMap[coinName]=r;
     });
     
@@ -647,12 +649,16 @@
       const row=rowMap[nm]; 
       if(!row)return;
       
-      const price=+d.c, change=+d.P;
-      row.cells[3].textContent=formatNum(price,7);
-      const dip=parseFloat(row.cells[2].textContent)||NaN;
-      const gr=dip?((price-dip)/dip*100):NaN;
-      row.cells[4].textContent=isNaN(gr)?'0':formatNum(gr,2)+'%'; 
-      row.cells[4].className=gr>=0?'green':'red';
+      const price=+d.c;
+      const oldPrice = previousPrices[nm] || 0; // Önceki fiyatı al
+      previousPrices[nm] = price; // Yeni fiyatı sakla
+      
+      // Güncel Fiyat hücresini güncelle
+      const priceCell = row.cells[3];
+      priceCell.textContent = formatNum(price,7);
+      priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
+      
+      const change=+d.P;
       row.cells[5].textContent=formatNum(change,2)+'%'; 
       row.cells[5].className=change>=0?'green':'red';
       
