@@ -75,18 +75,17 @@
       table-layout: fixed;
       font-size: 13px;
     }
-    thead th:nth-child(1), tbody td:nth-child(1) { width: 30px; }
-    thead th:nth-child(2), tbody td:nth-child(2) { width: 40px; }
+    thead th:nth-child(1), tbody td:nth-child(1) { width: 40px; }
+    thead th:nth-child(2), tbody td:nth-child(2) { width: 90px; }
     thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; }
     thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; }
-    thead th:nth-child(5), tbody td:nth-child(5) { width: 90px; }
+    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; }
     thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; }
-    thead th:nth-child(7), tbody td:nth-child(7) { width: 70px; }
+    thead th:nth-child(7), tbody td:nth-child(7) { width: 60px; }
     thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }
     thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }
-    thead th:nth-child(10), tbody td:nth-child(10) { width: 60px; }
 
-    thead th:nth-child(3), tbody td:nth-child(3) {
+    thead th:nth-child(2), tbody td:nth-child(2) {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -178,14 +177,6 @@
     }
     @media (max-width: 768px) { table { font-size: 12px; } }
     .sort-checkbox { margin-top: 3px; }
-    .star { 
-      cursor: pointer; 
-      font-size: 18px;
-      transition: color 0.2s;
-    }
-    .star.favori { color: #ffd700; }
-    .star:not(.favori):hover { color: #ffd70099; }
-    .favorite-checkbox { margin: 0; vertical-align: middle; }
   </style>
 </head>
 <body>
@@ -200,33 +191,30 @@
     <table id="coinTable">
       <thead>
         <tr>
-          <th>
-            <input type="checkbox" class="favorite-checkbox" onchange="toggleFavoritesFilter(this)">
-          </th>
           <th>#</th>
-          <th onclick="sortTable(2)">
+          <th onclick="sortTable(1)">
             Coin<br>
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
-          <th onclick="sortTable(3)">
+          <th onclick="sortTable(2)">
 <input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" onchange="updateTable()">
             Aylık Dip Fiyatı<br>
                       </th>
-          <th onclick="sortTable(4)">Güncel Fiyat</th>
-          <th onclick="sortTable(5)">Dipten Artış%<br>
+          <th onclick="sortTable(3)">Güncel Fiyat</th>
+          <th onclick="sortTable(4)">Dipten Artış%<br>
+            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(4, this)">
+          </th>
+          <th onclick="sortTable(5)">24s Değişim<br>
             <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(5, this)">
           </th>
-          <th onclick="sortTable(6)">24s Değişim<br>
+          <th onclick="sortTable(6)">A‑RSI<br>
             <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(6, this)">
           </th>
-          <th onclick="sortTable(7)">A‑RSI<br>
+          <th onclick="sortTable(7)">H‑RSI<br>
             <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(7, this)">
           </th>
-          <th onclick="sortTable(8)">H‑RSI<br>
+          <th onclick="sortTable(8)">G‑RSI<br>
             <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(8, this)">
-          </th>
-          <th onclick="sortTable(9)">G‑RSI<br>
-            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(9, this)">
           </th>
         </tr>
       </thead>
@@ -242,32 +230,7 @@
 
   let autoSortInterval = null;
   let currentSortColumn = null;
-  let favorites = new Set();
-  let showOnlyFavorites = false;
-
-  function toggleFavoritesFilter(checkbox) {
-    showOnlyFavorites = checkbox.checked;
-    filterTable();
-  }
-
-  function toggleFavorite(star, coinName) {
-    star.classList.toggle('favori');
-    if(favorites.has(coinName)) {
-      favorites.delete(coinName);
-    } else {
-      favorites.add(coinName);
-    }
-    if(showOnlyFavorites) filterTable();
-  }
-
-  function filterTable() {
-    const rows = tableBody.querySelectorAll('tr');
-    rows.forEach(row => {
-      const coinName = row.cells[2].querySelector('a').textContent;
-      row.style.display = (showOnlyFavorites && !favorites.has(coinName)) ? 'none' : '';
-    });
-  }
-
+  
   function handleCheckbox(col, checkbox) {
     const checkboxes = document.querySelectorAll('input[name="sortCheckbox"]');
     checkboxes.forEach(cb => {
@@ -287,8 +250,378 @@
     return val.toFixed(decimals).replace(/\.?(0)+$/, '');
   }
 
-  const coinList = ["1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA","ADX","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPHA","ALPINE","ALT","AMP","ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM","AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH","BEAMX","BEL","BERA","BICO","BIFI","BIGTIME","BIO","BLUR","BMT","BNB","BNSOL","BNT","BOME","BONK","BROCCOLI714","BTC","BTTC","C98","CAKE","CATI","CELO","CELR","CETUS","CFX","CGPT","CHR","CHZ","CITY","CKB","COOKIE","COS","COTI","COW","CRV","CTK","CTSI","CVC","CVX","CYBER","D","DASH","DATA","DCR","DEGO","DENT","DEXE","DF","DGB","DIA","DODO","DOGS","DUSK","DYDX","DYM","EDU","EGLD","EIGEN","ENA","ENJ","ENS","EPIC","ETC","ETH","ETHFI","FARM","FET","FIDA","FIL","FIO","FIS","FLM","FLOKI","FLOW","FLUX","FORM","FORTH","FTT","FUN","FXS","G","GALA","GAS","GHST","GLM","GLMR","GMX","GNO","GNS","GPS","GRT","GTC","GUN","HBAR","HEI","HFT","HIFI","HIGH","HIVE","HMSTR","HOOK","HOT","HYPER","ICP","ID","ICX","IDEX","ILV","IMX","INIT","INJ","IO","IOST","IOTA","IOTX","IQ","JASMY","JOE","JST","JTO","JUP","JUV","KAIA","KAITO","KAVA","KDA","KERNEL","KMD","KNC","KSM","LAYER","LAZIO","LDO","LEVER","LINK","LISTA","LOKA","LPT","LQTY","LRC","LSK","LTC","LTO","LUMIA","MAGIC","MANA","MANTA","MASK","MAV","MBL","MBOX","MDT","ME","MEME","METIS","MINA","MKR","MLN","MOVE","MOVR","MTL","MUBARAK","NEAR","NEIRO","NEO","NEXO","NFP","NIL","NKN","NMR","NOT","NTRN","OG","OGN","OMNI","ONDO","ONE","ONG","ONT","OP","ORCA","ORDI","OSMO","OXT","PARTI","PENDLE","PENGU","PEOPLE","PEPE","PERP","PHA","PHB","PIVX","PIXEL","PNUT","POL","POLYX","POND","PORTAL","PORTO","POWR","PROM","PSG","PUNDIX","PYR","PYTH","QI","QKC","QNT","QTUM","QUICK","RAD","RARE","RAY","RDNT","RED","REI","RENDER","REQ","REZ","RIF","RLC","RONIN","ROSE","RPL","RSR","RUNE","RVN","S","SAGA","SAND","SANTOS","SC","SCR","SCRT","SEI","SFP","SHELL","SHIB","SIGN","SKL","SLF","SNX","SOL","SOLV","SPELL","SSV","STEEM","STG","STORJ","STPT","STO","STRAX","STRK","STX","SUI","SUN","SUPER","SUSHI","SXP","SYN","SYS","T","TAO","TFUEL","THE","THETA","TIA","TKO","TLM","TNSR","TON","TRB","TRU","TRUMP","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA","VANRY","VELODROME","VET","VIC","VIRTUAL","VOXEL","VTHO","W","WAN","WAXP","WCT","WIF","WIN","WLD","WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"];
+  const coinList = ["1000CAT",
+"1000CHEEMS",
+"1000SATS",
+"1INCH",
+"1MBABYDOGE",
+"AAVE",
+"ACA",
+"ACE",
+"ACH",
+"ACM",
+"ACT",
+"ACX",
+"ADA",
+"ADX",
+"AEVO",
+"AGLD",
+"AI",
+"AIXBT",
+"ALCX",
+"ALGO",
+"ALICE",
+"ALPHA",
+"ALPINE",
+"ALT",
+"AMP",
+"ANIME",
+"ANKR",
+"APE",
+"API3",
+"APT",
+"AR",
+"ARB",
+"ARDR",
+"ARK",
+"ARKM",
+"ARPA",
+"ASR",
+"ASTR",
+"ATA",
+"ATM",
+"ATOM",
+"AUCTION",
+"AUDIO",
+"AVA",
+"AVAX",
+"AXL",
+"AXS",
+"BABY",
+"BAKE",
+"BANANA",
+"BANANAS31",
+"BAND",
+"BAR",
+"BAT",
+"BB",
+"BCH",
+"BEAMX",
+"BEL",
+"BERA",
+"BICO",
+"BIFI",
+"BIGTIME",
+"BIO",
+"BLUR",
+"BMT",
+"BNB",
+"BNSOL",
+"BNT",
+"BOME",
+"BONK",
+"BROCCOLI714",
+"BTC",
+"BTTC",
+"C98",
+"CAKE",
+"CATI",
+"CELO",
+"CELR",
+"CETUS",
+"CFX",
+"CGPT",
+"CHR",
+"CHZ",
+"CITY",
+"CKB",
+"COOKIE",
+"COS",
+"COTI",
+"COW",
+"CRV",
+"CTK",
+"CTSI",
+"CVC",
+"CVX",
+"CYBER",
+"D",
+"DASH",
+"DATA",
+"DCR",
+"DEGO",
+"DENT",
+"DEXE",
+"DF",
+"DGB",
+"DIA",
+"DODO",
+"DOGS",
+"DUSK",
+"DYDX",
+"DYM",
+"EDU",
+"EGLD",
+"EIGEN",
+"ENA",
+"ENJ",
+"ENS",
+"EPIC",
+"ETC",
+"ETH",
+"ETHFI",
+"FARM",
+"FET",
+"FIDA",
+"FIL",
+"FIO",
+"FIS",
+"FLM",
+"FLOKI",
+"FLOW",
+"FLUX",
+"FORM",
+"FORTH",
+"FTT",
+"FUN",
+"FXS",
+"G",
+"GALA",
+"GAS",
+"GHST",
+"GLM",
+"GLMR",
+"GMX",
+"GNO",
+"GNS",
+"GPS",
+"GRT",
+"GTC",
+"GUN",
+"HBAR",
+"HEI",
+"HFT",
+"HIFI",
+"HIGH",
+"HIVE",
+"HMSTR",
+"HOOK",
+"HOT",
+"HYPER",
+"ICP",
+"ID",
+"ICX",
+"IDEX",
+"ILV",
+"IMX",
+"INIT",
+"INJ",
+"IO",
+"IOST",
+"IOTA",
+"IOTX",
+"IQ",
+"JASMY",
+"JOE",
+"JST",
+"JTO",
+"JUP",
+"JUV",
+"KAIA",
+"KAITO",
+"KAVA",
+"KDA",
+"KERNEL",
+"KMD",
+"KNC",
+"KSM",
+"LAYER",
+"LAZIO",
+"LDO",
+"LEVER",
+"LINK",
+"LISTA",
+"LOKA",
+"LPT",
+"LQTY",
+"LRC",
+"LSK",
+"LTC",
+"LTO",
+"LUMIA",
+"MAGIC",
+"MANA",
+"MANTA",
+"MASK",
+"MAV",
+"MBL",
+"MBOX",
+"MDT",
+"ME",
+"MEME",
+"METIS",
+"MINA",
+"MKR",
+"MLN",
+"MOVE",
+"MOVR",
+"MTL",
+"MUBARAK",
+"NEAR",
+"NEIRO",
+"NEO",
+"NEXO",
+"NFP",
+"NIL",
+"NKN",
+"NMR",
+"NOT",
+"NTRN",
+"OG",
+"OGN",
+"OMNI",
+"ONDO",
+"ONE",
+"ONG",
+"ONT",
+"OP",
+"ORCA",
+"ORDI",
+"OSMO",
+"OXT",
+"PARTI",
+"PENDLE",
+"PENGU",
+"PEOPLE",
+"PEPE",
+"PERP",
+"PHA",
+"PHB",
+"PIVX",
+"PIXEL",
+"PNUT",
+"POL",
+"POLYX",
+"POND",
+"PORTAL",
+"PORTO",
+"POWR",
+"PROM",
+"PSG",
+"PUNDIX",
+"PYR",
+"PYTH",
+"QI",
+"QKC",
+"QNT",
+"QTUM",
+"QUICK",
+"RAD",
+"RARE",
+"RAY",
+"RDNT",
+"RED",
+"REI",
+"RENDER",
+"REQ",
+"REZ",
+"RIF",
+"RLC",
+"RONIN",
+"ROSE",
+"RPL",
+"RSR",
+"RUNE",
+"RVN",
+"S",
+"SAGA",
+"SAND",
+"SANTOS",
+"SC",
+"SCR",
+"SCRT",
+"SEI",
+"SFP",
+"SHELL",
+"SHIB",
+"SIGN",
+"SKL",
+"SLF",
+"SNX",
+"SOL",
+"SOLV",
+"SPELL",
+"SSV",
+"STEEM",
+"STG",
+"STORJ",
+"STPT",
+"STO",
+"STRAX",
+"STRK",
+"STX",
+"SUI",
+"SUN",
+"SUPER",
+"SUSHI",
+"SXP",
+"SYN",
+"SYS",
+"T",
+"TAO",
+"TFUEL",
+"THE",
+"THETA",
+"TIA",
+"TKO",
+"TLM",
+"TNSR",
+"TON",
+"TRB",
+"TRU",
+"TRUMP",
+"TST",
+"TURBO",
+"TUT",
+"TWT",
+"UMA",
+"UNI",
+"USUAL",
+"UTK",
+"VANA",
+"VANRY",
+"VELODROME",
+"VET",
+"VIC",
+"VIRTUAL",
+"VOXEL",
+"VTHO",
+"W",
+"WAN",
+"WAXP",
+"WCT",
+"WIF",
+"WIN",
+"WLD",
+"WOO",
+"XAI",
+"XEC",
+"XLM",
+"XNO",
+"XRP",
+"XTZ",
+"XVG",
+"XVS",
+"YFI",
+"YGG",
+"ZEC",
+"ZEN",
+"ZIL",
+"ZK",
+"ZRO",
+"ZRX"];
   const tableBody = document.querySelector('#coinTable tbody');
+  let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
   const rsiHistory = {};
   const previousPrices = {};
@@ -322,7 +655,6 @@
     data.forEach((c,i)=>{
       const row=document.createElement('tr');
       row.innerHTML=`
-        <td><span class="star" onclick="toggleFavorite(this, '${c.name}')">★</span></td>
         <td>${i+1}</td>
         <td class="coin-name">
           <a href="https://www.binance.com/en-TR/trade/${c.name}_USDT" target="_blank">${c.name}</a>
@@ -340,13 +672,11 @@
         <td class="h-rsi">…</td>
         <td class="g-rsi">…</td>
       `;
-      if(favorites.has(c.name)) row.cells[0].querySelector('.star').classList.add('favori');
       tableBody.appendChild(row);
       initRSIHistory(c.name,'1M',row.querySelector('.a-rsi'));
       initRSIHistory(c.name,'1w',row.querySelector('.h-rsi'));
       initRSIHistory(c.name,'1d',row.querySelector('.g-rsi'));
     });
-    filterTable();
   }
 
   function initRSIHistory(symbol,interval,cell){
@@ -366,7 +696,7 @@
     const ws=new WebSocket(`wss://stream.binance.com:9443/stream?streams=${coinList.map(n=>n.toLowerCase()+'usdt@ticker').join('/')}`);
     const rowMap={}; 
     tableBody.querySelectorAll('tr').forEach(r=>{
-      const coinName = r.cells[2].querySelector('a').textContent;
+      const coinName = r.cells[1].querySelector('a').textContent;
       rowMap[coinName]=r;
     });
     
@@ -380,13 +710,13 @@
       const oldPrice = previousPrices[nm] || 0;
       previousPrices[nm] = price;
       
-      const priceCell = row.cells[4];
+      const priceCell = row.cells[3];
       priceCell.textContent = formatNum(price,7);
       priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
       
       const change=+d.P;
-      row.cells[6].textContent=formatNum(change,2)+'%'; 
-      row.cells[6].className=change>=0?'green':'red';
+      row.cells[5].textContent=formatNum(change,2)+'%'; 
+      row.cells[5].className=change>=0?'green':'red';
       
       ['1M','1w','1d'].forEach((int,idx)=>{
         const hist=rsiHistory[nm]&&rsiHistory[nm][int]; 
@@ -394,7 +724,8 @@
         const arr=hist.slice(); 
         arr[arr.length-1]=price; 
         const val=computeRSIFromArray(arr);
-        const cell=row.querySelector(`td:nth-child(${8+idx})`);
+        const cls=idx===0?'.a-rsi':idx===1?'.h-rsi':'.g-rsi'; 
+        const cell=row.querySelector(cls);
         cell.textContent=isNaN(val)?'0':formatNum(val,2);
         cell.classList.remove('green','red'); 
         if(val>=70)cell.classList.add('green'); 
@@ -407,21 +738,21 @@
   function searchCoin(){
     const t=coinSearch.value.toLowerCase(); 
     tableBody.querySelectorAll('tr').forEach(r=>{
-      const coinName = r.cells[2].querySelector('a').textContent.toLowerCase();
-      r.style.display=(coinName.includes(t) && (!showOnlyFavorites || favorites.has(coinName.toUpperCase())))?'':'none';
+      const coinName = r.cells[1].querySelector('a').textContent.toLowerCase();
+      r.style.display=coinName.includes(t)?'':'none';
     });
   }
 
   function sortTable(col, forceDesc = false){
     if(currentSortColumn !== null && col !== currentSortColumn) return;
     
-    const rows=Array.from(tableBody.querySelectorAll('tr:not([style*="none"])'));
+    const rows=Array.from(tableBody.querySelectorAll('tr'));
     const dir = forceDesc ? -1 : sortDirection[col] ? 1 : -1;
     
     rows.sort((a,b)=>{
       let x=a.cells[col].textContent.trim();
       let y=b.cells[col].textContent.trim();
-      if(col>=3){
+      if(col>=2){
         x=parseFloat(x)||0;
         y=parseFloat(y)||0;
       }
@@ -429,7 +760,7 @@
     });
     
     rows.forEach((r,i)=>{
-      r.cells[1].textContent=i+1;
+      r.cells[0].textContent=i+1;
       tableBody.appendChild(r);
     });
     
