@@ -159,6 +159,7 @@
       margin: 5px auto;
     }
     @media (max-width: 768px) { table { font-size: 12px; } }
+    .sort-checkbox { margin-top: 3px; }
   </style>
 </head>
 <body>
@@ -180,11 +181,21 @@
             Aylık Dip Fiyatı<br>
                       </th>
           <th onclick="sortTable(3)">Güncel Fiyat</th>
-          <th onclick="sortTable(4)">Dipten Artış<br>%</th>
-          <th onclick="sortTable(5)">24s Değişim</th>
-          <th onclick="sortTable(6)">A‑RSI</th>
-          <th onclick="sortTable(7)">H‑RSI</th>
-          <th onclick="sortTable(8)">G‑RSI</th>
+          <th onclick="sortTable(4)">Dipten Artış%<br>
+            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(4, this)">
+          </th>
+          <th onclick="sortTable(5)">24s Değişim<br>
+            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(5, this)">
+          </th>
+          <th onclick="sortTable(6)">A‑RSI<br>
+            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(6, this)">
+          </th>
+          <th onclick="sortTable(7)">H‑RSI<br>
+            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(7, this)">
+          </th>
+          <th onclick="sortTable(8)">G‑RSI<br>
+            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(8, this)">
+          </th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -193,6 +204,24 @@
 </div>
 
 <script>
+  let autoSortInterval = null;
+  let currentSortColumn = null;
+  
+  function handleCheckbox(col, checkbox) {
+    const checkboxes = document.querySelectorAll('input[name="sortCheckbox"]');
+    checkboxes.forEach(cb => {
+      if(cb !== checkbox) cb.checked = false;
+    });
+    
+    if(checkbox.checked) {
+      currentSortColumn = col;
+      autoSortInterval = setInterval(() => sortTable(col, true), 1000);
+    } else {
+      currentSortColumn = null;
+      clearInterval(autoSortInterval);
+    }
+  }
+
   function formatNum(val, decimals) {
     return val.toFixed(decimals).replace(/\.?(0)+$/, '');
   }
@@ -568,7 +597,7 @@
   let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
   const rsiHistory = {};
-  const previousPrices = {}; // Önceki fiyatları saklamak için eklendi
+  const previousPrices = {};
 
   function computeRSIFromArray(closes) {
     if (closes.length <= RSI_PERIOD) return NaN;
@@ -650,10 +679,9 @@
       if(!row)return;
       
       const price=+d.c;
-      const oldPrice = previousPrices[nm] || 0; // Önceki fiyatı al
-      previousPrices[nm] = price; // Yeni fiyatı sakla
+      const oldPrice = previousPrices[nm] || 0;
+      previousPrices[nm] = price;
       
-      // Güncel Fiyat hücresini güncelle
       const priceCell = row.cells[3];
       priceCell.textContent = formatNum(price,7);
       priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
@@ -687,9 +715,12 @@
     });
   }
 
-  function sortTable(col){
+  function sortTable(col, forceDesc = false){
+    if(currentSortColumn !== null && col !== currentSortColumn) return;
+    
     const rows=Array.from(tableBody.querySelectorAll('tr'));
-    const dir=sortDirection[col]?1:-1;
+    const dir = forceDesc ? -1 : sortDirection[col] ? 1 : -1;
+    
     rows.sort((a,b)=>{
       let x=a.cells[col].textContent.trim();
       let y=b.cells[col].textContent.trim();
@@ -699,11 +730,13 @@
       }
       return x>y?dir:x<y?-dir:0;
     });
+    
     rows.forEach((r,i)=>{
       r.cells[0].textContent=i+1;
       tableBody.appendChild(r);
     });
-    sortDirection[col]=!sortDirection[col];
+    
+    if(!forceDesc) sortDirection[col]=!sortDirection[col];
   }
 
   dipMonths.addEventListener('click',e=>e.stopPropagation()); 
