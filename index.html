@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
 <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=E7kXDlAgCj90&format=png&color=000000">
@@ -14,27 +14,6 @@
       padding: 10px;
       text-align: center;
       overflow-x: hidden;
-    }
-    .loading-container {
-      width: 200px;
-      height: 3px;
-      background: rgba(15, 25, 35, 0.8);
-      margin: 5px auto 15px;
-      border-radius: 3px;
-      overflow: hidden;
-      display: none;
-    }
-    .loading-bar {
-      width: 100%;
-      height: 100%;
-      background: #00ffc3;
-      animation: loading 1.5s infinite;
-      transform-origin: left;
-    }
-    @keyframes loading {
-      0% { transform: scaleX(0); }
-      50% { transform: scaleX(1); opacity: 1; }
-      100% { transform: scaleX(1) translateX(100%); opacity: 0; }
     }
     .table-container {
       display: flex;
@@ -75,16 +54,18 @@
       table-layout: fixed;
       font-size: 13px;
     }
-    thead th:nth-child(1), tbody td:nth-child(1) { width: 40px; }
-    thead th:nth-child(2), tbody td:nth-child(2) { width: 90px; }
-    thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; }
-    thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; }
-    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; }
-    thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; }
-    thead th:nth-child(7), tbody td:nth-child(7) { width: 60px; }
-    thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }
-    thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }
+    /* Sütun genişlikleri */
+    thead th:nth-child(1), tbody td:nth-child(1) { width: 40px; }  /* # */
+    thead th:nth-child(2), tbody td:nth-child(2) { width: 90px; } /* Coin */
+    thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; } /* Aylık Dip Fiyatı */
+    thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; } /* Güncel Fiyat */
+    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; } /* Dipten Artış */
+    thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; } /* 24s Değişim */
+    thead th:nth-child(7), tbody td:nth-child(7) { width: 60px; }  /* A-RSI */
+    thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }  /* H-RSI */
+    thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }  /* G-RSI */
 
+    /* Narrow coin column */
     thead th:nth-child(2), tbody td:nth-child(2) {
       white-space: nowrap;
       overflow: hidden;
@@ -110,7 +91,7 @@
       text-align: center;
       border: 1px solid #00ffc322;
       font-size: 13px;
-      transition: color 0.1s ease;
+      transition: color 0.1s ease; /* Renk geçiş efekti eklendi */
     }
     td.green { color: #00ff00; font-weight: bold; text-shadow: 0 0 5px rgba(0, 255, 0, 0.3); }
     td.red   { color: #ff4d4d; font-weight: bold; text-shadow: 0 0 5px rgba(255, 77, 77, 0.3); }
@@ -123,6 +104,7 @@
       text-overflow: ellipsis;
       position: relative;
     }
+    /* Link stilleri eklendi */
     td.coin-name a {
       color: inherit;
       text-decoration: none;
@@ -140,6 +122,7 @@
       color: #00ffc3 !important;
       text-decoration: none !important;
     }
+    /* Search input narrower & smaller */
     .search-input {
       margin-top: 2px;
       padding: 3px;
@@ -176,15 +159,11 @@
       margin: 5px auto;
     }
     @media (max-width: 768px) { table { font-size: 12px; } }
-    .sort-checkbox { margin-top: 3px; }
   </style>
 </head>
 <body>
 
 <h2>🚀 Coin Performans Tablosu</h2>
-<div class="loading-container" id="loading">
-  <div class="loading-bar"></div>
-</div>
 
 <div class="table-container">
   <div class="table-wrapper">
@@ -197,25 +176,15 @@
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
           <th onclick="sortTable(2)">
-<input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" oninput="updateTable()">
+<input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" onchange="updateTable()">
             Aylık Dip Fiyatı<br>
                       </th>
           <th onclick="sortTable(3)">Güncel Fiyat</th>
-          <th onclick="sortTable(4)">Dipten Artış%<br>
-            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(4, this)">
-          </th>
-          <th onclick="sortTable(5)">24s Değişim<br>
-            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(5, this)">
-          </th>
-          <th onclick="sortTable(6)">A‑RSI<br>
-            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(6, this)">
-          </th>
-          <th onclick="sortTable(7)">H‑RSI<br>
-            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(7, this)">
-          </th>
-          <th onclick="sortTable(8)">G‑RSI<br>
-            <input type="checkbox" class="sort-checkbox" name="sortCheckbox" onchange="handleCheckbox(8, this)">
-          </th>
+          <th onclick="sortTable(4)">Dipten Artış</th>
+          <th onclick="sortTable(5)">24s Değişim</th>
+          <th onclick="sortTable(6)">A‑RSI</th>
+          <th onclick="sortTable(7)">H‑RSI</th>
+          <th onclick="sortTable(8)">G‑RSI</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -224,28 +193,6 @@
 </div>
 
 <script>
-  const loadingElement = document.getElementById('loading');
-  function showLoader() { loadingElement.style.display = 'block'; }
-  function hideLoader() { loadingElement.style.display = 'none'; }
-
-  let autoSortInterval = null;
-  let currentSortColumn = null;
-  
-  function handleCheckbox(col, checkbox) {
-    const checkboxes = document.querySelectorAll('input[name="sortCheckbox"]');
-    checkboxes.forEach(cb => {
-      if(cb !== checkbox) cb.checked = false;
-    });
-    
-    if(checkbox.checked) {
-      currentSortColumn = col;
-      autoSortInterval = setInterval(() => sortTable(col, true), 1000);
-    } else {
-      currentSortColumn = null;
-      clearInterval(autoSortInterval);
-    }
-  }
-
   function formatNum(val, decimals) {
     return val.toFixed(decimals).replace(/\.?(0)+$/, '');
   }
@@ -410,7 +357,6 @@
 "HYPER",
 "ICP",
 "ID",
-"ICX",
 "IDEX",
 "ILV",
 "IMX",
@@ -565,7 +511,6 @@
 "SUPER",
 "SUSHI",
 "SXP",
-"SYN",
 "SYS",
 "T",
 "TAO",
@@ -592,7 +537,6 @@
 "VANRY",
 "VELODROME",
 "VET",
-"VIC",
 "VIRTUAL",
 "VOXEL",
 "VTHO",
@@ -624,7 +568,7 @@
   let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
   const rsiHistory = {};
-  const previousPrices = {};
+  const previousPrices = {}; // Önceki fiyatları saklamak için eklendi
 
   function computeRSIFromArray(closes) {
     if (closes.length <= RSI_PERIOD) return NaN;
@@ -636,7 +580,6 @@
   }
 
   function updateTable() {
-    showLoader();
     const months = Math.max(1, parseInt(dipMonths.value)||1);
     fetch('https://api.binance.com/api/v3/ticker/24hr').then(r=>r.json()).then(data=>{
       const map24 = new Map(data.map(d=>[d.symbol,d]));
@@ -647,7 +590,7 @@
           return {name,dip,currentPrice:+o.lastPrice||NaN,priceChange:+o.priceChangePercent||NaN};
         })
       ));
-    }).then(list=>{renderTable(list);setupWebSocket();}).finally(() => hideLoader());
+    }).then(list=>{renderTable(list);setupWebSocket();});
   }
 
   function renderTable(data) {
@@ -707,9 +650,10 @@
       if(!row)return;
       
       const price=+d.c;
-      const oldPrice = previousPrices[nm] || 0;
-      previousPrices[nm] = price;
+      const oldPrice = previousPrices[nm] || 0; // Önceki fiyatı al
+      previousPrices[nm] = price; // Yeni fiyatı sakla
       
+      // Güncel Fiyat hücresini güncelle
       const priceCell = row.cells[3];
       priceCell.textContent = formatNum(price,7);
       priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
@@ -743,12 +687,9 @@
     });
   }
 
-  function sortTable(col, forceDesc = false){
-    if(currentSortColumn !== null && col !== currentSortColumn) return;
-    
+  function sortTable(col){
     const rows=Array.from(tableBody.querySelectorAll('tr'));
-    const dir = forceDesc ? -1 : sortDirection[col] ? 1 : -1;
-    
+    const dir=sortDirection[col]?1:-1;
     rows.sort((a,b)=>{
       let x=a.cells[col].textContent.trim();
       let y=b.cells[col].textContent.trim();
@@ -758,13 +699,11 @@
       }
       return x>y?dir:x<y?-dir:0;
     });
-    
     rows.forEach((r,i)=>{
       r.cells[0].textContent=i+1;
       tableBody.appendChild(r);
     });
-    
-    if(!forceDesc) sortDirection[col]=!sortDirection[col];
+    sortDirection[col]=!sortDirection[col];
   }
 
   dipMonths.addEventListener('click',e=>e.stopPropagation()); 
