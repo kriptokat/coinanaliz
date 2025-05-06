@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=E7kXDlAgCj90&format=png&color=000000">
@@ -176,12 +176,19 @@
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
           <th onclick="sortTable(2)">
-<input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" onchange="updateTable()">
+<input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()"               onclick="event.stopPropagation()" 
+       oninput="updateTable()" 
+       onchange="updateTable()">
             Aylık Dip Fiyatı<br>
                       </th>
           <th onclick="sortTable(3)">Güncel Fiyat</th>
           <th onclick="sortTable(4)">Dipten Artış</th>
-          <th onclick="sortTable(5)">24s Değişim</th>
+<th onclick="sortTable(5)">
+  24s Değişim<br>
+  <input type="checkbox" class="filter-checkbox" 
+         id="autoSortCheckbox" 
+         onclick="event.stopPropagation()">
+</th>
           <th onclick="sortTable(6)">A‑RSI</th>
           <th onclick="sortTable(7)">H‑RSI</th>
           <th onclick="sortTable(8)">G‑RSI</th>
@@ -193,6 +200,8 @@
 </div>
 
 <script>
+  let autoSortInterval = null; // Yeni eklenen interval değişkeni
+  
   function formatNum(val, decimals) {
     return val.toFixed(decimals).replace(/\.?(0)+$/, '');
   }
@@ -689,6 +698,12 @@
 
   function sortTable(col){
     const rows=Array.from(tableBody.querySelectorAll('tr'));
+    
+    // Otomatik sıralama aktifse sadece Z-A sırala
+    if(col === 5 && autoSortCheckbox.checked){
+      sortDirection[col] = false;
+    }
+    
     const dir=sortDirection[col]?1:-1;
     rows.sort((a,b)=>{
       let x=a.cells[col].textContent.trim();
@@ -705,6 +720,18 @@
     });
     sortDirection[col]=!sortDirection[col];
   }
+
+  // Checkbox değişiklik dinleyicisi eklendi
+  autoSortCheckbox.addEventListener('change', function() {
+    if(this.checked) {
+      autoSortInterval = setInterval(() => {
+        sortTable(5); // 5. sütunu (24s Değişim) sırala
+      }, 1000);
+    } else {
+      clearInterval(autoSortInterval);
+      autoSortInterval = null;
+    }
+  });
 
   dipMonths.addEventListener('click',e=>e.stopPropagation()); 
   updateTable();
