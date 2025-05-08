@@ -176,7 +176,7 @@
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
           <th onclick="sortTable(2)">
-<input id="dipMonths" type="number" min="1" value="36" class="dip-input" onclick="event.stopPropagation()"               onclick="event.stopPropagation()" 
+<input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()"               onclick="event.stopPropagation()" 
        oninput="updateTable()" 
        onchange="updateTable()">
             Aylık Dip Fiyatı<br>
@@ -189,8 +189,18 @@
          id="autoSortCheckbox" 
          onclick="event.stopPropagation()">
 </th>
-          <th onclick="sortTable(6)">A‑RSI</th>
-          <th onclick="sortTable(7)">H‑RSI</th>
+          <th onclick="sortTable(6)">
+            A‑RSI<br>
+            <input type="checkbox" id="arsiFilter" 
+                   onclick="event.stopPropagation()"
+                   onchange="filterByARSI()">
+          </th>
+          <th onclick="sortTable(7)">
+            H‑RSI<br>
+            <input type="checkbox" id="hrsiFilter" 
+                   onclick="event.stopPropagation()"
+                   onchange="filterByHRSI()">
+          </th>
           <th onclick="sortTable(8)">G‑RSI</th>
         </tr>
       </thead>
@@ -206,7 +216,8 @@
     return val.toFixed(decimals).replace(/\.?(0)+$/, '');
   }
 
-  const coinList = ["1000CAT",
+  const coinList = [
+"1000CAT",
 "1000CHEEMS",
 "1000SATS",
 "1INCH",
@@ -538,8 +549,8 @@
 "SUPER",
 "SUSHI",
 "SXP",
-"SXT",                    
 "SYN",
+"SXT",
 "SYRUP",
 "SYS",
 "T",
@@ -720,6 +731,34 @@
     tableBody.querySelectorAll('tr').forEach(r=>{
       const coinName = r.cells[1].querySelector('a').textContent.toLowerCase();
       r.style.display=coinName.includes(t)?'':'none';
+    });
+  }
+
+  // Yeni eklenen filtreleme fonksiyonu
+  function filterByARSI(){
+    const filterEnabled = document.getElementById('arsiFilter').checked;
+    tableBody.querySelectorAll('tr').forEach(r=>{
+      if(filterEnabled) {
+        const arsiValue = parseFloat(r.cells[6].textContent);
+        const shouldShow = arsiValue >= 70;
+        r.style.display = shouldShow ? '' : 'none';
+      } else {
+        r.style.display = '';
+      }
+    });
+  }
+
+  // H-RSI için yeni filtreleme fonksiyonu
+  function filterByHRSI(){
+    const filterEnabled = document.getElementById('hrsiFilter').checked;
+    tableBody.querySelectorAll('tr').forEach(r=>{
+      if(filterEnabled) {
+        const hrsiValue = parseFloat(r.cells[7].textContent);
+        const shouldShow = hrsiValue >= 70;
+        r.style.display = shouldShow ? '' : 'none';
+      } else {
+        r.style.display = '';
+      }
     });
   }
 
