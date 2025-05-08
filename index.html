@@ -15,6 +15,37 @@
       text-align: center;
       overflow-x: hidden;
     }
+    /* Yeni Progress Bar Stilleri */
+    .progress-container {
+      width: 300px;
+      margin: 15px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #00ffc355;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.5s;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 20px;
+      background: linear-gradient(90deg, #00ffc3, #00ffaa);
+      transition: width 0.5s ease;
+    }
+    .progress-text {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      font-family: 'Roboto Mono', monospace;
+      color: #000000;
+      text-shadow: 0 0 5px #00ffc3;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+    /* Orijinal Stiller */
     .table-container {
       display: flex;
       justify-content: center;
@@ -54,18 +85,15 @@
       table-layout: fixed;
       font-size: 13px;
     }
-    /* Sütun genişlikleri */
-    thead th:nth-child(1), tbody td:nth-child(1) { width: 40px; }  /* # */
-    thead th:nth-child(2), tbody td:nth-child(2) { width: 90px; } /* Coin */
-    thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; } /* Aylık Dip Fiyatı */
-    thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; } /* Güncel Fiyat */
-    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; } /* Dipten Artış */
-    thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; } /* 24s Değişim */
-    thead th:nth-child(7), tbody td:nth-child(7) { width: 60px; }  /* A-RSI */
-    thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }  /* H-RSI */
-    thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }  /* G-RSI */
-
-    /* Narrow coin column */
+    thead th:nth-child(1), tbody td:nth-child(1) { width: 40px; }
+    thead th:nth-child(2), tbody td:nth-child(2) { width: 90px; }
+    thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; }
+    thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; }
+    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; }
+    thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; }
+    thead th:nth-child(7), tbody td:nth-child(7) { width: 60px; }
+    thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }
+    thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }
     thead th:nth-child(2), tbody td:nth-child(2) {
       white-space: nowrap;
       overflow: hidden;
@@ -91,7 +119,7 @@
       text-align: center;
       border: 1px solid #00ffc322;
       font-size: 13px;
-      transition: color 0.1s ease; /* Renk geçiş efekti eklendi */
+      transition: color 0.1s ease;
     }
     td.green { color: #00ff00; font-weight: bold; text-shadow: 0 0 5px rgba(0, 255, 0, 0.3); }
     td.red   { color: #ff4d4d; font-weight: bold; text-shadow: 0 0 5px rgba(255, 77, 77, 0.3); }
@@ -104,7 +132,6 @@
       text-overflow: ellipsis;
       position: relative;
     }
-    /* Link stilleri eklendi */
     td.coin-name a {
       color: inherit;
       text-decoration: none;
@@ -122,7 +149,6 @@
       color: #00ffc3 !important;
       text-decoration: none !important;
     }
-    /* Search input narrower & smaller */
     .search-input {
       margin-top: 2px;
       padding: 3px;
@@ -165,6 +191,11 @@
 
 <h2>🚀 Coin Performans Tablosu</h2>
 
+<div class="progress-container">
+  <div class="progress-bar"></div>
+  <div class="progress-text">%0 Yüklendi</div>
+</div>
+
 <div class="table-container">
   <div class="table-wrapper">
     <table id="coinTable">
@@ -176,11 +207,9 @@
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
           <th onclick="sortTable(2)">
-<input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()"               onclick="event.stopPropagation()" 
-       oninput="updateTable()" 
-       onchange="updateTable()">
+<input id="dipMonths" type="number" min="1" value="5" class="dip-input" onclick="event.stopPropagation()" oninput="updateTable()" onchange="updateTable()">
             Aylık Dip Fiyatı<br>
-                      </th>
+          </th>
           <th onclick="sortTable(3)">Güncel Fiyat</th>
           <th onclick="sortTable(4)">Dipten Artış</th>
 <th onclick="sortTable(5)">
@@ -210,8 +239,26 @@
 </div>
 
 <script>
-  let autoSortInterval = null; // Yeni eklenen interval değişkeni
-  
+  let autoSortInterval = null;
+  const progressBar = document.querySelector('.progress-bar');
+  const progressText = document.querySelector('.progress-text');
+  const progressContainer = document.querySelector('.progress-container');
+  let loadedCoins = 0;
+
+  function updateProgress() {
+    const totalCoins = coinList.length;
+    const percent = Math.round((loadedCoins / totalCoins) * 100);
+    progressBar.style.width = `${percent}%`;
+    progressText.textContent = `${percent}% Yüklendi`;
+    
+    if(percent === 100) {
+      setTimeout(() => {
+        progressContainer.style.opacity = '0';
+        setTimeout(() => progressContainer.style.display = 'none', 500);
+      }, 1000);
+    }
+  }
+
   function formatNum(val, decimals) {
     return val.toFixed(decimals).replace(/\.?(0)+$/, '');
   }
@@ -610,12 +657,13 @@
 "ZIL",
 "ZK",
 "ZRO",
-"ZRX"];
+"ZRX"
+];
   const tableBody = document.querySelector('#coinTable tbody');
   let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
   const rsiHistory = {};
-  const previousPrices = {}; // Önceki fiyatları saklamak için eklendi
+  const previousPrices = {};
 
   function computeRSIFromArray(closes) {
     if (closes.length <= RSI_PERIOD) return NaN;
@@ -627,11 +675,18 @@
   }
 
   function updateTable() {
+    loadedCoins = 0;
+    progressContainer.style.display = 'block';
+    progressContainer.style.opacity = '1';
+    updateProgress();
+
     const months = Math.max(1, parseInt(dipMonths.value)||1);
     fetch('https://api.binance.com/api/v3/ticker/24hr').then(r=>r.json()).then(data=>{
       const map24 = new Map(data.map(d=>[d.symbol,d]));
       return Promise.all(coinList.map(name=>
         fetch(`https://api.binance.com/api/v3/klines?symbol=${name}USDT&interval=1M&limit=${months+1}`).then(r=>r.json()).then(klines=>{
+          loadedCoins++;
+          updateProgress();
           klines.pop(); const dipArr=klines.map(k=>+k[3]); const dip=dipArr.length?Math.min(...dipArr):NaN;
           const o=map24.get(name+'USDT')||{};
           return {name,dip,currentPrice:+o.lastPrice||NaN,priceChange:+o.priceChangePercent||NaN};
@@ -697,10 +752,9 @@
       if(!row)return;
       
       const price=+d.c;
-      const oldPrice = previousPrices[nm] || 0; // Önceki fiyatı al
-      previousPrices[nm] = price; // Yeni fiyatı sakla
+      const oldPrice = previousPrices[nm] || 0;
+      previousPrices[nm] = price;
       
-      // Güncel Fiyat hücresini güncelle
       const priceCell = row.cells[3];
       priceCell.textContent = formatNum(price,7);
       priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
@@ -734,28 +788,24 @@
     });
   }
 
-  // Yeni eklenen filtreleme fonksiyonu
   function filterByARSI(){
     const filterEnabled = document.getElementById('arsiFilter').checked;
     tableBody.querySelectorAll('tr').forEach(r=>{
       if(filterEnabled) {
         const arsiValue = parseFloat(r.cells[6].textContent);
-        const shouldShow = arsiValue >= 70;
-        r.style.display = shouldShow ? '' : 'none';
+        r.style.display = arsiValue >= 70 ? '' : 'none';
       } else {
         r.style.display = '';
       }
     });
   }
 
-  // H-RSI için yeni filtreleme fonksiyonu
   function filterByHRSI(){
     const filterEnabled = document.getElementById('hrsiFilter').checked;
     tableBody.querySelectorAll('tr').forEach(r=>{
       if(filterEnabled) {
         const hrsiValue = parseFloat(r.cells[7].textContent);
-        const shouldShow = hrsiValue >= 70;
-        r.style.display = shouldShow ? '' : 'none';
+        r.style.display = hrsiValue >= 70 ? '' : 'none';
       } else {
         r.style.display = '';
       }
@@ -765,7 +815,6 @@
   function sortTable(col){
     const rows=Array.from(tableBody.querySelectorAll('tr'));
     
-    // Otomatik sıralama aktifse sadece Z-A sırala
     if(col === 5 && autoSortCheckbox.checked){
       sortDirection[col] = false;
     }
@@ -787,12 +836,9 @@
     sortDirection[col]=!sortDirection[col];
   }
 
-  // Checkbox değişiklik dinleyicisi eklendi
   autoSortCheckbox.addEventListener('change', function() {
     if(this.checked) {
-      autoSortInterval = setInterval(() => {
-        sortTable(5); // 5. sütunu (24s Değişim) sırala
-      }, 1000);
+      autoSortInterval = setInterval(() => sortTable(5), 1000);
     } else {
       clearInterval(autoSortInterval);
       autoSortInterval = null;
