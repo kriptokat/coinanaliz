@@ -634,7 +634,6 @@
 "VELODROME",
 "VET",
 "VIB",
-"VIC",
 "VIRTUAL",
 "VOXEL",
 "VTHO",
@@ -843,12 +842,22 @@
     rows.sort((a,b)=>{
       let x=a.cells[col].textContent.trim();
       let y=b.cells[col].textContent.trim();
-      if(col>=2){
+      
+      // Coin sütunu için metin bazlı sıralama
+      if(col === 2) {
+        return x.localeCompare(y, 'en', {numeric: true}) * dir;
+      }
+      
+      // Diğer sütunlar için numerik sıralama
+      if(col >= 3) {
         x=parseFloat(x)||0;
         y=parseFloat(y)||0;
+        return x>y?dir:x<y?-dir:0;
       }
-      return x>y?dir:x<y?-dir:0;
+      
+      return 0;
     });
+    
     rows.forEach((r,i)=>{
       r.cells[1].textContent=i+1;
       tableBody.appendChild(r);
