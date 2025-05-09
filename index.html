@@ -705,7 +705,7 @@
           <a href="https://www.binance.com/en-TR/trade/${c.name}_USDT" target="_blank">${c.name}</a>
           <a href="https://tr.tradingview.com/chart/8tydse0K/?symbol=BINANCE%3A${c.name}USDT" target="_blank" class="chart-emoji">📈</a>
         </td>
-        <td>${isNaN(c.dip)?'0':formatNum(c.dip,6)}</td>
+        <td>${isNaN(c.dip)?'0':formatNum(c.dip,10)}</td>
         <td>${isNaN(c.currentPrice)?'0':formatNum(c.currentPrice,7)}</td>
         <td class="${c.dip&&((c.currentPrice-c.dip)/c.dip*100)>0?'green':'red'}">
           ${!isNaN(c.dip)?formatNum((c.currentPrice-c.dip)/c.dip*100,2)+'%':'0'}
