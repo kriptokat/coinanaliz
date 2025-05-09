@@ -85,16 +85,17 @@
       table-layout: fixed;
       font-size: 13px;
     }
-    thead th:nth-child(1), tbody td:nth-child(1) { width: 40px; }
-    thead th:nth-child(2), tbody td:nth-child(2) { width: 90px; }
+    thead th:nth-child(1), tbody td:nth-child(1) { width: 30px; }
+    thead th:nth-child(2), tbody td:nth-child(2) { width: 40px; }
     thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; }
     thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; }
-    thead th:nth-child(5), tbody td:nth-child(5) { width: 70px; }
+    thead th:nth-child(5), tbody td:nth-child(5) { width: 90px; }
     thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; }
-    thead th:nth-child(7), tbody td:nth-child(7) { width: 60px; }
+    thead th:nth-child(7), tbody td:nth-child(7) { width: 70px; }
     thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }
     thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }
-    thead th:nth-child(2), tbody td:nth-child(2) {
+    thead th:nth-child(10), tbody td:nth-child(10) { width: 60px; }
+    thead th:nth-child(3), tbody td:nth-child(3) {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -201,36 +202,41 @@
     <table id="coinTable">
       <thead>
         <tr>
+          <th>★<br>
+            <input type="checkbox" id="favoriteFilter" 
+                   onclick="event.stopPropagation()"
+                   onchange="filterFavorites()">
+          </th>
           <th>#</th>
-          <th onclick="sortTable(1)">
+          <th onclick="sortTable(2)">
             Coin<br>
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
-          <th onclick="sortTable(2)">
-<input id="dipMonths" type="number" min="1" value="24" class="dip-input" onclick="event.stopPropagation()" oninput="updateTable()" onchange="updateTable()">
+          <th onclick="sortTable(3)">
+<input id="dipMonths" type="number" min="1" value="18" class="dip-input" onclick="event.stopPropagation()" oninput="updateTable()" onchange="updateTable()">
             Aylık Dip Fiyatı<br>
           </th>
-          <th onclick="sortTable(3)">Güncel Fiyat</th>
-          <th onclick="sortTable(4)">Dipten Artış</th>
-<th onclick="sortTable(5)">
+          <th onclick="sortTable(4)">Güncel Fiyat</th>
+          <th onclick="sortTable(5)">Dipten Artış</th>
+<th onclick="sortTable(6)">
   24s Değişim<br>
   <input type="checkbox" class="filter-checkbox" 
          id="autoSortCheckbox" 
          onclick="event.stopPropagation()">
 </th>
-          <th onclick="sortTable(6)">
+          <th onclick="sortTable(7)">
             A‑RSI<br>
             <input type="checkbox" id="arsiFilter" 
                    onclick="event.stopPropagation()"
                    onchange="filterByARSI()">
           </th>
-          <th onclick="sortTable(7)">
+          <th onclick="sortTable(8)">
             H‑RSI<br>
             <input type="checkbox" id="hrsiFilter" 
                    onclick="event.stopPropagation()"
                    onchange="filterByHRSI()">
           </th>
-          <th onclick="sortTable(8)">G‑RSI</th>
+          <th onclick="sortTable(9)">G‑RSI</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -244,6 +250,7 @@
   const progressText = document.querySelector('.progress-text');
   const progressContainer = document.querySelector('.progress-container');
   let loadedCoins = 0;
+  let favorites = JSON.parse(localStorage.getItem('favorites')) || {};
 
   function updateProgress() {
     const totalCoins = coinList.length;
@@ -657,8 +664,7 @@
 "ZIL",
 "ZK",
 "ZRO",
-"ZRX"
-];
+"ZRX"];
   const tableBody = document.querySelector('#coinTable tbody');
   let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
@@ -700,6 +706,7 @@
     data.forEach((c,i)=>{
       const row=document.createElement('tr');
       row.innerHTML=`
+        <td><input type="checkbox" class="favorite-checkbox" ${favorites[c.name]?'checked':''} onchange="toggleFavorite('${c.name}', this.checked)"></td>
         <td>${i+1}</td>
         <td class="coin-name">
           <a href="https://www.binance.com/en-TR/trade/${c.name}_USDT" target="_blank">${c.name}</a>
@@ -724,6 +731,19 @@
     });
   }
 
+  function toggleFavorite(name, isFavorite) {
+    favorites[name] = isFavorite;
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }
+
+  function filterFavorites() {
+    const filterEnabled = document.getElementById('favoriteFilter').checked;
+    tableBody.querySelectorAll('tr').forEach(r=>{
+      const coinName = r.cells[2].querySelector('a').textContent;
+      r.style.display = filterEnabled ? (favorites[coinName] ? '' : 'none') : '';
+    });
+  }
+
   function initRSIHistory(symbol,interval,cell){
     const lim=interval==='1d'?RSI_HIST_DAILY:RSI_HIST_OTHER;
     fetch(`https://api.binance.com/api/v3/klines?symbol=${symbol}USDT&interval=${interval}&limit=${lim}`)
@@ -741,7 +761,7 @@
     const ws=new WebSocket(`wss://stream.binance.com:9443/stream?streams=${coinList.map(n=>n.toLowerCase()+'usdt@ticker').join('/')}`);
     const rowMap={}; 
     tableBody.querySelectorAll('tr').forEach(r=>{
-      const coinName = r.cells[1].querySelector('a').textContent;
+      const coinName = r.cells[2].querySelector('a').textContent;
       rowMap[coinName]=r;
     });
     
@@ -755,13 +775,13 @@
       const oldPrice = previousPrices[nm] || 0;
       previousPrices[nm] = price;
       
-      const priceCell = row.cells[3];
+      const priceCell = row.cells[4];
       priceCell.textContent = formatNum(price,7);
       priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
       
       const change=+d.P;
-      row.cells[5].textContent=formatNum(change,2)+'%'; 
-      row.cells[5].className=change>=0?'green':'red';
+      row.cells[6].textContent=formatNum(change,2)+'%'; 
+      row.cells[6].className=change>=0?'green':'red';
       
       ['1M','1w','1d'].forEach((int,idx)=>{
         const hist=rsiHistory[nm]&&rsiHistory[nm][int]; 
@@ -783,7 +803,7 @@
   function searchCoin(){
     const t=coinSearch.value.toLowerCase(); 
     tableBody.querySelectorAll('tr').forEach(r=>{
-      const coinName = r.cells[1].querySelector('a').textContent.toLowerCase();
+      const coinName = r.cells[2].querySelector('a').textContent.toLowerCase();
       r.style.display=coinName.includes(t)?'':'none';
     });
   }
@@ -792,7 +812,7 @@
     const filterEnabled = document.getElementById('arsiFilter').checked;
     tableBody.querySelectorAll('tr').forEach(r=>{
       if(filterEnabled) {
-        const arsiValue = parseFloat(r.cells[6].textContent);
+        const arsiValue = parseFloat(r.cells[7].textContent);
         r.style.display = arsiValue >= 70 ? '' : 'none';
       } else {
         r.style.display = '';
@@ -804,7 +824,7 @@
     const filterEnabled = document.getElementById('hrsiFilter').checked;
     tableBody.querySelectorAll('tr').forEach(r=>{
       if(filterEnabled) {
-        const hrsiValue = parseFloat(r.cells[7].textContent);
+        const hrsiValue = parseFloat(r.cells[8].textContent);
         r.style.display = hrsiValue >= 70 ? '' : 'none';
       } else {
         r.style.display = '';
@@ -815,7 +835,7 @@
   function sortTable(col){
     const rows=Array.from(tableBody.querySelectorAll('tr'));
     
-    if(col === 5 && autoSortCheckbox.checked){
+    if(col === 6 && autoSortCheckbox.checked){
       sortDirection[col] = false;
     }
     
@@ -830,7 +850,7 @@
       return x>y?dir:x<y?-dir:0;
     });
     rows.forEach((r,i)=>{
-      r.cells[0].textContent=i+1;
+      r.cells[1].textContent=i+1;
       tableBody.appendChild(r);
     });
     sortDirection[col]=!sortDirection[col];
@@ -838,7 +858,7 @@
 
   autoSortCheckbox.addEventListener('change', function() {
     if(this.checked) {
-      autoSortInterval = setInterval(() => sortTable(5), 1000);
+      autoSortInterval = setInterval(() => sortTable(6), 1000);
     } else {
       clearInterval(autoSortInterval);
       autoSortInterval = null;
