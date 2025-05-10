@@ -634,6 +634,7 @@
 "VELODROME",
 "VET",
 "VIB",
+"VIC",
 "VIRTUAL",
 "VOXEL",
 "VTHO",
@@ -737,6 +738,11 @@
 
   function filterFavorites() {
     const filterEnabled = document.getElementById('favoriteFilter').checked;
+    // A-RSI ve H-RSI filtrelerini kapat
+    if(filterEnabled) {
+      document.getElementById('arsiFilter').checked = false;
+      document.getElementById('hrsiFilter').checked = false;
+    }
     tableBody.querySelectorAll('tr').forEach(r=>{
       const coinName = r.cells[2].querySelector('a').textContent;
       r.style.display = filterEnabled ? (favorites[coinName] ? '' : 'none') : '';
@@ -809,6 +815,7 @@
 
   function filterByARSI(){
     const filterEnabled = document.getElementById('arsiFilter').checked;
+    if(filterEnabled) document.getElementById('favoriteFilter').checked = false;
     tableBody.querySelectorAll('tr').forEach(r=>{
       if(filterEnabled) {
         const arsiValue = parseFloat(r.cells[7].textContent);
@@ -821,6 +828,7 @@
 
   function filterByHRSI(){
     const filterEnabled = document.getElementById('hrsiFilter').checked;
+    if(filterEnabled) document.getElementById('favoriteFilter').checked = false;
     tableBody.querySelectorAll('tr').forEach(r=>{
       if(filterEnabled) {
         const hrsiValue = parseFloat(r.cells[8].textContent);
