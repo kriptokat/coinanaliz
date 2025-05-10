@@ -6,6 +6,91 @@
   <title>Coin Performans Tablosu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* Yeni Portföy Stilleri */
+    .portfolio-modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(15, 25, 35, 0.98);
+      border: 1px solid #00ffc3;
+      border-radius: 10px;
+      padding: 20px;
+      width: 450px;
+      max-width: 90%;
+      z-index: 1000;
+      box-shadow: 0 0 20px rgba(0, 255, 195, 0.3);
+    }
+    .portfolio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .portfolio-close {
+      cursor: pointer;
+      color: #00ffc3;
+      font-size: 24px;
+    }
+    #portfolioForm {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    #coinSelect, #amountInput {
+      flex: 1;
+      padding: 5px;
+      background: #1c2c3c;
+      border: 1px solid #00ffc3;
+      color: #e0e0e0;
+      border-radius: 3px;
+    }
+    .portfolio-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+    .portfolio-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px;
+      border-bottom: 1px solid #00ffc322;
+    }
+    .portfolio-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .delete-portfolio-item {
+      color: #ff4d4d;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 0 5px;
+    }
+    .delete-portfolio-item:hover {
+      color: #ff0000;
+    }
+    .portfolio-total {
+      text-align: right;
+      font-weight: bold;
+      color: #00ffc3;
+    }
+    .portfolio-button {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: #00ffc3;
+      color: #0f2027;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: bold;
+    }
+    /* Orijinal Stiller */
     * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -15,7 +100,6 @@
       text-align: center;
       overflow-x: hidden;
     }
-    /* Yeni Progress Bar Stilleri */
     .progress-container {
       width: 300px;
       margin: 15px auto;
@@ -45,7 +129,6 @@
       transform: translateY(-50%);
       pointer-events: none;
     }
-    /* Orijinal Stiller */
     .table-container {
       display: flex;
       justify-content: center;
@@ -191,6 +274,26 @@
 <body>
 
 <h2>🚀 Coin Performans Tablosu</h2>
+<button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
+
+<!-- Portföy Modal -->
+<div class="portfolio-modal" id="portfolioModal">
+  <div class="portfolio-header">
+    <h3>Portföy Yönetimi</h3>
+    <span class="portfolio-close" onclick="togglePortfolio()">&times;</span>
+  </div>
+  <form id="portfolioForm" onsubmit="addToPortfolio(event)">
+    <select id="coinSelect" required>
+      <option value="" disabled selected>Coin Seç</option>
+    </select>
+    <input type="number" id="amountInput" step="0.001" placeholder="Miktar" required>
+    <button type="submit">Ekle</button>
+  </form>
+  <div class="portfolio-list" id="portfolioList"></div>
+  <div class="portfolio-total">
+    Toplam Değer: <span id="portfolioTotal">0</span> $
+  </div>
+</div>
 
 <div class="progress-container">
   <div class="progress-bar"></div>
@@ -245,6 +348,75 @@
 </div>
 
 <script>
+  // Portföy Fonksiyonları
+  let portfolio = JSON.parse(localStorage.getItem('portfolio')) || {};
+  
+  function togglePortfolio() {
+    const modal = document.getElementById('portfolioModal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    if(modal.style.display === 'block') initPortfolioModal();
+  }
+
+  function initPortfolioModal() {
+    const select = document.getElementById('coinSelect');
+    select.innerHTML = '<option value="" disabled selected>Coin Seç</option>';
+    coinList.forEach(coin => {
+      const option = document.createElement('option');
+      option.value = coin;
+      option.textContent = coin;
+      select.appendChild(option);
+    });
+    updatePortfolioDisplay();
+  }
+
+  function addToPortfolio(e) {
+    e.preventDefault();
+    const coin = document.getElementById('coinSelect').value;
+    const amount = parseFloat(document.getElementById('amountInput').value);
+    
+    portfolio[coin] = (portfolio[coin] || 0) + amount;
+    localStorage.setItem('portfolio', JSON.stringify(portfolio));
+    updatePortfolioDisplay();
+    document.getElementById('amountInput').value = '';
+  }
+
+  function deletePortfolioItem(coin) {
+    delete portfolio[coin];
+    localStorage.setItem('portfolio', JSON.stringify(portfolio));
+    updatePortfolioDisplay();
+  }
+
+  function updatePortfolioDisplay() {
+    const list = document.getElementById('portfolioList');
+    const totalElement = document.getElementById('portfolioTotal');
+    list.innerHTML = '';
+    let total = 0;
+    
+    Object.entries(portfolio).forEach(([coin, amount]) => {
+      const price = parseFloat(
+        [...document.querySelectorAll('.coin-name a')]
+          .find(a => a.textContent === coin)
+          ?.closest('tr')
+          .querySelector('td:nth-child(5)').textContent
+      ) || 0;
+      
+      const item = document.createElement('div');
+      item.className = 'portfolio-item';
+      item.innerHTML = `
+        <span>${coin}</span>
+        <div class="portfolio-item-controls">
+          <span>${amount} x ${price}$ = ${(amount * price).toFixed(2)}$</span>
+          <span class="delete-portfolio-item" onclick="deletePortfolioItem('${coin}')">×</span>
+        </div>
+      `;
+      list.appendChild(item);
+      total += amount * price;
+    });
+    
+    totalElement.textContent = total.toFixed(2);
+  }
+
+  // Orijinal Scriptler
   let autoSortInterval = null;
   const progressBar = document.querySelector('.progress-bar');
   const progressText = document.querySelector('.progress-text');
@@ -271,400 +443,30 @@
   }
 
   const coinList = [
-"1000CAT",
-"1000CHEEMS",
-"1000SATS",
-"1INCH",
-"1MBABYDOGE",
-"AAVE",
-"ACA",
-"ACE",
-"ACH",
-"ACM",
-"ACT",
-"ACX",
-"ADA",
-"ADX",
-"AEUR",
-"AEVO",
-"AGLD",
-"AI",
-"AIXBT",
-"ALCX",
-"ALGO",
-"ALICE",
-"ALPACA",
-"ALPHA",
-"ALPINE",
-"ALT",
-"AMP",
-"ANIME",
-"ANKR",
-"APE",
-"API3",
-"APT",
-"AR",
-"ARB",
-"ARDR",
-"ARK",
-"ARKM",
-"ARPA",
-"ASR",
-"ASTR",
-"ATA",
-"ATM",
-"ATOM",
-"AUCTION",
-"AUDIO",
-"AVA",
-"AVAX",
-"AXL",
-"AXS",
-"BABY",
-"BAKE",
-"BANANA",
-"BANANAS31",
-"BAND",
-"BAR",
-"BAT",
-"BB",
-"BCH",
-"BEAMX",
-"BEL",
-"BERA",
-"BICO",
-"BIFI",
-"BIGTIME",
-"BIO",
-"BLUR",
-"BMT",
-"BNB",
-"BNSOL",
-"BNT",
-"BOME",
-"BONK",
-"BROCCOLI714",
-"BSW",
-"BTC",
-"BTTC",
-"C98",
-"CAKE",
-"CATI",
-"CELO",
-"CELR",
-"CETUS",
-"CFX",
-"CGPT",
-"CHESS",
-"CHR",
-"CHZ",
-"CITY",
-"CKB",
-"COMP",
-"COOKIE",
-"COS",
-"COTI",
-"COW",
-"CRV",
-"CTK",
-"CTSI",
-"CVC",
-"CVX",
-"CYBER",
-"D",
-"DASH",
-"DATA",
-"DCR",
-"DEGO",
-"DENT",
-"DEXE",
-"DF",
-"DGB",
-"DIA",
-"DODO",
-"DOGE",
-"DOGS",
-"DOT",
-"DUSK",
-"DYDX",
-"DYM",
-"EDU",
-"EGLD",
-"EIGEN",
-"ENA",
-"ENJ",
-"ENS",
-"EOS",
-"EPIC",
-"ETC",
-"ETH",
-"ETHFI",
-"EURI",
-"FARM",
-"FET",
-"FIDA",
-"FIL",
-"FIO",
-"FIS",
-"FLM",
-"FLOKI",
-"FLOW",
-"FLUX",
-"FORM",
-"FORTH",
-"FTT",
-"FUN",
-"FXS",
-"G",
-"GALA",
-"GAS",
-"GHST",
-"GLM",
-"GLMR",
-"GMT",
-"GMX",
-"GNO",
-"GNS",
-"GPS",
-"GRT",
-"GTC",
-"GUN",
-"HBAR",
-"HEI",
-"HFT",
-"HIFI",
-"HIGH",
-"HIVE",
-"HMSTR",
-"HOOK",
-"HOT",
-"HYPER",
-"ICP",
-"ICX",
-"ID",
-"IDEX",
-"ILV",
-"IMX",
-"INIT",
-"INJ",
-"IO",
-"IOST",
-"IOTA",
-"IOTX",
-"IQ",
-"JASMY",
-"JOE",
-"JST",
-"JTO",
-"JUP",
-"JUV",
-"KAIA",
-"KAITO",
-"KAVA",
-"KDA",
-"KERNEL",
-"KMD",
-"KMNO",
-"KNC",
-"KSM",
-"LAYER",
-"LAZIO",
-"LDO",
-"LEVER",
-"LINK",
-"LISTA",
-"LOKA",
-"LPT",
-"LQTY",
-"LRC",
-"LSK",
-"LTC",
-"LTO",
-"LUMIA",
-"LUNA",
-"LUNC",
-"MAGIC",
-"MANA",
-"MANTA",
-"MASK",
-"MAV",
-"MBL",
-"MBOX",
-"MDT",
-"ME",
-"MEME",
-"METIS",
-"MINA",
-"MKR",
-"MLN",
-"MOVE",
-"MOVR",
-"MTL",
-"MUBARAK",
-"NEAR",
-"NEIRO",
-"NEO",
-"NEXO",
-"NFP",
-"NIL",
-"NKN",
-"NMR",
-"NOT",
-"NTRN",
-"OG",
-"OGN",
-"OM",
-"OMNI",
-"ONDO",
-"ONE",
-"ONG",
-"ONT",
-"OP",
-"ORCA",
-"ORDI",
-"OSMO",
-"OXT",
-"PARTI",
-"PAXG",
-"PDA",
-"PENDLE",
-"PENGU",
-"PEOPLE",
-"PEPE",
-"PERP",
-"PHA",
-"PHB",
-"PIVX",
-"PIXEL",
-"PNUT",
-"POL",
-"POLYX",
-"POND",
-"PORTAL",
-"PORTO",
-"POWR",
-"PROM",
-"PSG",
-"PUNDIX",
-"PYR",
-"PYTH",
-"QI",
-"QKC",
-"QNT",
-"QTUM",
-"QUICK",
-"RAD",
-"RARE",
-"RAY",
-"RDNT",
-"RED",
-"REI",
-"RENDER",
-"REQ",
-"REZ",
-"RIF",
-"RLC",
-"RONIN",
-"ROSE",
-"RPL",
-"RSR",
-"RUNE",
-"RVN",
-"S",
-"SAGA",
-"SAND",
-"SANTOS",
-"SC",
-"SCR",
-"SCRT",
-"SEI",
-"SFP",
-"SHELL",
-"SHIB",
-"SIGN",
-"SKL",
-"SLF",
-"SLP",
-"SNX",
-"SOL",
-"SOLV",
-"SPELL",
-"SSV",
-"STEEM",
-"STG",
-"STO",
-"STORJ",
-"STPT",
-"STRAX",
-"STRK",
-"STX",
-"SUI",
-"SUN",
-"SUPER",
-"SUSHI",
-"SXP",
-"SYN",
-"SXT",
-"SYRUP",
-"SYS",
-"T",
-"TAO",
-"TFUEL",
-"THE",
-"THETA",
-"TIA",
-"TKO",
-"TLM",
-"TNSR",
-"TON",
-"TRB",
-"TRU",
-"TRUMP",
-"TRX",
-"TST",
-"TURBO",
-"TUT",
-"TWT",
-"UMA",
-"UNI",
-"USUAL",
-"UTK",
-"VANA",
-"VANRY",
-"VELODROME",
-"VET",
-"VIB",
-"VIC",
-"VIRTUAL",
-"VOXEL",
-"VTHO",
-"W",
-"WAN",
-"WAXP",
-"WBETH",
-"WBTC",
-"WCT",
-"WIF",
-"WIN",
-"WING",
-"WLD",
-"WOO",
-"XAI",
-"XEC",
-"XLM",
-"XNO",
-"XRP",
-"XTZ",
-"XVG",
-"XVS",
-"YFI",
-"YGG",
-"ZEC",
-"ZEN",
-"ZIL",
-"ZK",
-"ZRO",
-"ZRX"];
+    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
+    "ADX","AEUR","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPACA","ALPHA","ALPINE","ALT","AMP",
+    "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
+    "AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
+    "BEAMX","BEL","BERA","BICO","BIFI","BIGTIME","BIO","BLUR","BMT","BNB","BNSOL","BNT","BOME","BONK","BROCCOLI714",
+    "BSW","BTC","BTTC","C98","CAKE","CATI","CELO","CELR","CETUS","CFX","CGPT","CHESS","CHR","CHZ","CITY","CKB",
+    "COMP","COOKIE","COS","COTI","COW","CRV","CTK","CTSI","CVC","CVX","CYBER","D","DASH","DATA","DCR","DEGO","DENT",
+    "DEXE","DF","DGB","DIA","DODO","DOGE","DOGS","DOT","DUSK","DYDX","DYM","EDU","EGLD","EIGEN","ENA","ENJ","ENS","EOS",
+    "EPIC","ETC","ETH","ETHFI","EURI","FARM","FET","FIDA","FIL","FIO","FIS","FLM","FLOKI","FLOW","FLUX","FORM","FORTH",
+    "FTT","FUN","FXS","G","GALA","GAS","GHST","GLM","GLMR","GMT","GMX","GNO","GNS","GPS","GRT","GTC","GUN","HBAR","HEI",
+    "HFT","HIFI","HIGH","HIVE","HMSTR","HOOK","HOT","HYPER","ICP","ICX","ID","IDEX","ILV","IMX","INIT","INJ","IO","IOST",
+    "IOTA","IOTX","IQ","JASMY","JOE","JST","JTO","JUP","JUV","KAIA","KAITO","KAVA","KDA","KERNEL","KMD","KMNO","KNC","KSM",
+    "LAYER","LAZIO","LDO","LEVER","LINK","LISTA","LOKA","LPT","LQTY","LRC","LSK","LTC","LTO","LUMIA","LUNA","LUNC","MAGIC",
+    "MANA","MANTA","MASK","MAV","MBL","MBOX","MDT","ME","MEME","METIS","MINA","MKR","MLN","MOVE","MOVR","MTL","MUBARAK",
+    "NEAR","NEIRO","NEO","NEXO","NFP","NIL","NKN","NMR","NOT","NTRN","OG","OGN","OM","OMNI","ONDO","ONE","ONG","ONT","OP",
+    "ORCA","ORDI","OSMO","OXT","PARTI","PAXG","PDA","PENDLE","PENGU","PEOPLE","PEPE","PERP","PHA","PHB","PIVX","PIXEL","PNUT",
+    "POL","POLYX","POND","PORTAL","PORTO","POWR","PROM","PSG","PUNDIX","PYR","PYTH","QI","QKC","QNT","QTUM","QUICK","RAD",
+    "RARE","RAY","RDNT","RED","REI","RENDER","REQ","REZ","RIF","RLC","RONIN","ROSE","RPL","RSR","RUNE","RVN","S","SAGA","SAND",
+    "SANTOS","SC","SCR","SCRT","SEI","SFP","SHELL","SHIB","SIGN","SKL","SLF","SLP","SNX","SOL","SOLV","SPELL","SSV","STEEM","STG",
+    "STO","STORJ","STPT","STRAX","STRK","STX","SUI","SUN","SUPER","SUSHI","SXP","SYN","SXT","SYRUP","SYS","T","TAO","TFUEL","THE",
+    "THETA","TIA","TKO","TLM","TNSR","TON","TRB","TRU","TRUMP","TRX","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA",
+    "VANRY","VELODROME","VET","VIB","VIC","VIRTUAL","VOXEL","VTHO","W","WAN","WAXP","WBETH","WBTC","WCT","WIF","WIN","WING","WLD",
+    "WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"
+  ];
   const tableBody = document.querySelector('#coinTable tbody');
   let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
@@ -701,9 +503,9 @@
     }).then(list=>{renderTable(list);setupWebSocket();});
   }
 
-  function renderTable(data) {
+  function renderTable(list) {
     tableBody.innerHTML='';
-    data.forEach((c,i)=>{
+    list.forEach((c,i)=>{
       const row=document.createElement('tr');
       row.innerHTML=`
         <td><input type="checkbox" class="favorite-checkbox" ${favorites[c.name]?'checked':''} onchange="toggleFavorite('${c.name}', this.checked)"></td>
@@ -738,7 +540,6 @@
 
   function filterFavorites() {
     const filterEnabled = document.getElementById('favoriteFilter').checked;
-    // A-RSI ve H-RSI filtrelerini kapat
     if(filterEnabled) {
       document.getElementById('arsiFilter').checked = false;
       document.getElementById('hrsiFilter').checked = false;
@@ -851,12 +652,10 @@
       let x=a.cells[col].textContent.trim();
       let y=b.cells[col].textContent.trim();
       
-      // Coin sütunu için metin bazlı sıralama
       if(col === 2) {
         return x.localeCompare(y, 'en', {numeric: true}) * dir;
       }
       
-      // Diğer sütunlar için numerik sıralama
       if(col >= 3) {
         x=parseFloat(x)||0;
         y=parseFloat(y)||0;
