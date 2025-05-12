@@ -178,7 +178,6 @@
     thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }
     thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }
     thead th:nth-child(10), tbody td:nth-child(10) { width: 60px; }
-    thead th:nth-child(11), tbody td:nth-child(11) { width: 70px; }
     thead th:nth-child(3), tbody td:nth-child(3) {
       white-space: nowrap;
       overflow: hidden;
@@ -317,7 +316,7 @@
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
           <th onclick="sortTable(3)">
-<input id="dipMonths" type="number" min="1" value="12" class="dip-input" onclick="event.stopPropagation()" oninput="updateTable()" onchange="updateTable()">
+<input id="dipMonths" type="number" min="1" value="18" class="dip-input" onclick="event.stopPropagation()" oninput="updateTable()" onchange="updateTable()">
             Aylık Dip Fiyatı<br>
           </th>
           <th onclick="sortTable(4)">Güncel Fiyat</th>
@@ -341,7 +340,6 @@
                    onchange="filterByHRSI()">
           </th>
           <th onclick="sortTable(9)">G‑RSI</th>
-          <th onclick="sortTable(10)">Puan</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -445,400 +443,32 @@
   }
 
   const coinList = [
-    "1000CAT",
-"1000CHEEMS",
-"1000SATS",
-"1INCH",
-"1MBABYDOGE",
-"AAVE",
-"ACA",
-"ACE",
-"ACH",
-"ACM",
-"ACT",
-"ACX",
-"ADA",
-"ADX",
-"AEUR",
-"AEVO",
-"AGLD",
-"AI",
-"AIXBT",
-"ALCX",
-"ALGO",
-"ALICE",
-"ALPHA",
-"ALPINE",
-"ALT",
-"AMP",
-"ANIME",
-"ANKR",
-"APE",
-"API3",
-"APT",
-"AR",
-"ARB",
-"ARDR",
-"ARK",
-"ARKM",
-"ARPA",
-"ASR",
-"ASTR",
-"ATA",
-"ATM",
-"ATOM",
-"AUCTION",
-"AUDIO",
-"AVA",
-"AVAX",
-"AXL",
-"AXS",
-"BABY",
-"BAKE",
-"BANANA",
-"BANANAS31",
-"BAND",
-"BAR",
-"BAT",
-"BB",
-"BCH",
-"BEAMX",
-"BEL",
-"BERA",
-"BICO",
-"BIFI",
-"BIGTIME",
-"BIO",
-"BLUR",
-"BMT",
-"BNB",
-"BNSOL",
-"BNT",
-"BOME",
-"BONK",
-"BROCCOLI714",
-"BSW",
-"BTC",
-"BTTC",
-"C98",
-"CAKE",
-"CATI",
-"CELO",
-"CELR",
-"CETUS",
-"CFX",
-"CGPT",
-"CHESS",
-"CHR",
-"CHZ",
-"CITY",
-"CKB",
-"COMP",
-"COOKIE",
-"COS",
-"COTI",
-"COW",
-"CRV",
-"CTK",
-"CTSI",
-"CVC",
-"CVX",
-"CYBER",
-"D",
-"DASH",
-"DATA",
-"DCR",
-"DEGO",
-"DENT",
-"DEXE",
-"DF",
-"DGB",
-"DIA",
-"DODO",
-"DOGE",
-"DOGS",
-"DOT",
-"DUSK",
-"DYDX",
-"DYM",
-"EDU",
-"EGLD",
-"EIGEN",
-"ENA",
-"ENJ",
-"ENS",
-"EOS",
-"EPIC",
-"ETC",
-"ETH",
-"ETHFI",
-"EURI",
-"FARM",
-"FET",
-"FIDA",
-"FIL",
-"FIO",
-"FIS",
-"FLM",
-"FLOKI",
-"FLOW",
-"FLUX",
-"FORM",
-"FORTH",
-"FTT",
-"FUN",
-"FXS",
-"G",
-"GALA",
-"GAS",
-"GHST",
-"GLM",
-"GLMR",
-"GMT",
-"GMX",
-"GNO",
-"GNS",
-"GPS",
-"GRT",
-"GTC",
-"GUN",
-"HBAR",
-"HEI",
-"HFT",
-"HIFI",
-"HIGH",
-"HIVE",
-"HMSTR",
-"HOOK",
-"HOT",
-"HYPER",
-"ICP",
-"ICX",
-"ID",
-"IDEX",
-"ILV",
-"IMX",
-"INIT",
-"INJ",
-"IO",
-"IOST",
-"IOTA",
-"IOTX",
-"IQ",
-"JASMY",
-"JOE",
-"JST",
-"JTO",
-"JUP",
-"JUV",
-"KAIA",
-"KAITO",
-"KAVA",
-"KDA",
-"KERNEL",
-"KMD",
-"KMNO",
-"KNC",
-"KSM",
-"LAYER",
-"LAZIO",
-"LDO",
-"LEVER",
-"LINK",
-"LISTA",
-"LOKA",
-"LPT",
-"LQTY",
-"LRC",
-"LSK",
-"LTC",
-"LTO",
-"LUMIA",
-"LUNA",
-"LUNC",
-"MAGIC",
-"MANA",
-"MANTA",
-"MASK",
-"MAV",
-"MBL",
-"MBOX",
-"MDT",
-"ME",
-"MEME",
-"METIS",
-"MINA",
-"MKR",
-"MLN",
-"MOVE",
-"MOVR",
-"MTL",
-"MUBARAK",
-"NEAR",
-"NEIRO",
-"NEO",
-"NEXO",
-"NFP",
-"NIL",
-"NKN",
-"NMR",
-"NOT",
-"NTRN",
-"OG",
-"OGN",
-"OM",
-"OMNI",
-"ONDO",
-"ONE",
-"ONG",
-"ONT",
-"OP",
-"ORCA",
-"ORDI",
-"OSMO",
-"OXT",
-"PARTI",
-"PAXG",
-"PDA",
-"PENDLE",
-"PENGU",
-"PEOPLE",
-"PEPE",
-"PERP",
-"PHA",
-"PHB",
-"PIVX",
-"PIXEL",
-"PNUT",
-"POL",
-"POLYX",
-"POND",
-"PORTAL",
-"PORTO",
-"POWR",
-"PROM",
-"PSG",
-"PUNDIX",
-"PYR",
-"PYTH",
-"QI",
-"QKC",
-"QNT",
-"QTUM",
-"QUICK",
-"RAD",
-"RARE",
-"RAY",
-"RDNT",
-"RED",
-"REI",
-"RENDER",
-"REQ",
-"REZ",
-"RIF",
-"RLC",
-"RONIN",
-"ROSE",
-"RPL",
-"RSR",
-"RUNE",
-"RVN",
-"S",
-"SAGA",
-"SAND",
-"SANTOS",
-"SC",
-"SCR",
-"SCRT",
-"SEI",
-"SFP",
-"SHELL",
-"SHIB",
-"SIGN",
-"SKL",
-"SLF",
-"SLP",
-"SNX",
-"SOL",
-"SOLV",
-"SPELL",
-"SSV",
-"STEEM",
-"STG",
-"STO",
-"STORJ",
-"STPT",
-"STRAX",
-"STRK",
-"STX",
-"SUI",
-"SUN",
-"SUPER",
-"SUSHI",
-"SXP",
-"SYN",
-"SXT",
-"SYRUP",
-"SYS",
-"T",
-"TAO",
-"TFUEL",
-"THE",
-"THETA",
-"TIA",
-"TKO",
-"TLM",
-"TNSR",
-"TON",
-"TRB",
-"TRU",
-"TRUMP",
-"TRX",
-"TST",
-"TURBO",
-"TUT",
-"TWT",
-"UMA",
-"UNI",
-"USUAL",
-"UTK",
-"VANA",
-"VANRY",
-"VELODROME",
-"VET",
-"VIC",
-"VIRTUAL",
-"VOXEL",
-"VTHO",
-"W",
-"WAN",
-"WAXP",
-"WBETH",
-"WBTC",
-"WCT",
-"WIF",
-"WIN",
-"WLD",
-"WOO",
-"XAI",
-"XEC",
-"XLM",
-"XNO",
-"XRP",
-"XTZ",
-"XVG",
-"XVS",
-"YFI",
-"YGG",
-"ZEC",
-"ZEN",
-"ZIL",
-"ZK",
-"ZRO",
-"ZRX"
+    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
+    "ADX","AEUR","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPHA","ALPINE","ALT","AMP",
+    "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
+    "AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
+    "BEAMX","BEL","BERA","BICO","BIFI","BIGTIME","BIO","BLUR","BMT","BNB","BNSOL","BNT","BOME","BONK","BROCCOLI714",
+    "BSW","BTC","BTTC","C98","CAKE","CATI","CELO","CELR","CETUS","CFX","CGPT","CHESS","CHR","CHZ","CITY","CKB",
+    "COMP","COOKIE","COS","COTI","COW","CRV","CTK","CTSI","CVC","CVX","CYBER","D","DASH","DATA","DCR","DEGO","DENT",
+    "DEXE","DF","DGB","DIA","DODO","DOGE","DOGS","DOT","DUSK","DYDX","DYM","EDU","EGLD","EIGEN","ENA","ENJ","ENS","EOS",
+    "EPIC","ETC","ETH","ETHFI","EURI","FARM","FET","FIDA","FIL","FIO","FIS","FLM","FLOKI","FLOW","FLUX","FORM","FORTH",
+    "FTT","FUN","FXS","G","GALA","GAS","GHST","GLM","GLMR","GMT","GMX","GNO","GNS","GPS","GRT","GTC","GUN","HBAR","HEI",
+    "HFT","HIFI","HIGH","HIVE","HMSTR","HOOK","HOT","HYPER","ICP","ICX","ID","IDEX","ILV","IMX","INIT","INJ","IO","IOST",
+    "IOTA","IOTX","IQ","JASMY","JOE","JST","JTO","JUP","JUV","KAIA","KAITO","KAVA","KDA","KERNEL","KMD","KMNO","KNC","KSM",
+    "LAYER","LAZIO","LDO","LEVER","LINK","LISTA","LOKA","LPT","LQTY","LRC","LSK","LTC","LTO","LUMIA","LUNA","LUNC","MAGIC",
+    "MANA","MANTA","MASK","MAV","MBL","MBOX","MDT","ME","MEME","METIS","MINA","MKR","MLN","MOVE","MOVR","MTL","MUBARAK",
+    "NEAR","NEIRO","NEO","NEXO","NFP","NIL","NKN","NMR","NOT","NTRN","OG","OGN","OM","OMNI","ONDO","ONE","ONG","ONT","OP",
+    "ORCA","ORDI","OSMO","OXT","PARTI","PAXG","PDA","PENDLE","PENGU","PEOPLE","PEPE","PERP","PHA","PHB","PIVX","PIXEL","PNUT",
+    "POL","POLYX","POND","PORTAL","PORTO","POWR","PROM","PSG","PUNDIX","PYR","PYTH","QI","QKC","QNT","QTUM","QUICK","RAD",
+    "RARE","RAY","RDNT","RED","REI","RENDER","REQ","REZ","RIF","RLC","RONIN","ROSE","RPL","RSR","RUNE","RVN","S","SAGA","SAND",
+    "SANTOS","SC","SCR","SCRT","SEI","SFP","SHELL","SHIB","SIGN","SKL","SLF","SLP","SNX","SOL","SOLV","SPELL","SSV","STEEM","STG",
+    "STO","STORJ","STPT","STRAX","STRK","STX","SUI","SUN","SUPER","SUSHI","SXP","SYN","SXT","SYRUP","SYS","T","TAO","TFUEL","THE",
+    "THETA","TIA","TKO","TLM","TNSR","TON","TRB","TRU","TRUMP","TRX","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA",
+    "VANRY","VELODROME","VET","VIC","VIRTUAL","VOXEL","VTHO","W","WAN","WAXP","WBETH","WBTC","WCT","WIF","WIN","WLD",
+    "WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"
   ];
   const tableBody = document.querySelector('#coinTable tbody');
-  let sortDirection = Array(11).fill(true);
+  let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
   const rsiHistory = {};
   const previousPrices = {};
@@ -850,22 +480,6 @@
     let avgG=gain/RSI_PERIOD, avgL=loss/RSI_PERIOD;
     for (let i=RSI_PERIOD+1;i<closes.length;i++){const d=closes[i]-closes[i-1],g=d>0?d:0,l=d<0?-d:0;avgG=(avgG*(RSI_PERIOD-1)+g)/RSI_PERIOD;avgL=(avgL*(RSI_PERIOD-1)+l)/RSI_PERIOD;}
     if(avgL===0) return 100; const rs=avgG/avgL; return 100-(100/(1+rs));
-  }
-
-  function calculateScore(row) {
-    const arsi = parseFloat(row.cells[7].textContent) || 0;
-    const hrsi = parseFloat(row.cells[8].textContent) || 0;
-    const grsi = parseFloat(row.cells[9].textContent) || 0;
-    const dipArtis = parseFloat(row.cells[5].textContent) || 0;
-    
-    const normalizedDip = Math.max(0, 100 - Math.abs(dipArtis));
-    const score = 
-      (arsi * 0.5) + 
-      (hrsi * 0.25) + 
-      (grsi * 0.05) + 
-      (normalizedDip * 0.2);
-    
-    return Math.min(1000, Math.round(score * 10));
   }
 
   function updateTable() {
@@ -911,7 +525,6 @@
         <td class="a-rsi">…</td>
         <td class="h-rsi">…</td>
         <td class="g-rsi">…</td>
-        <td class="score">0</td>
       `;
       tableBody.appendChild(row);
       initRSIHistory(c.name,'1M',row.querySelector('.a-rsi'));
@@ -947,9 +560,6 @@
         const val=computeRSIFromArray(closes);
         cell.textContent=isNaN(val)?'0':formatNum(val,2);
         cell.classList.remove('green','red'); if(val>=70)cell.classList.add('green'); else if(val<=30)cell.classList.add('red');
-        
-        const row = cell.closest('tr');
-        if(row) row.querySelector('.score').textContent = calculateScore(row);
       }).catch(_=>cell.textContent='0');
   }
 
@@ -991,8 +601,6 @@
         cell.classList.remove('green','red'); 
         if(val>=70)cell.classList.add('green'); 
         else if(val<=30)cell.classList.add('red');
-        
-        row.querySelector('.score').textContent = calculateScore(row);
       });
     };
     ws.onclose=()=>setTimeout(setupWebSocket,5000);
@@ -1049,13 +657,8 @@
       }
       
       if(col >= 3) {
-        if(col === 10) {
-          x = parseInt(x) || 0;
-          y = parseInt(y) || 0;
-        } else {
-          x=parseFloat(x)||0;
-          y=parseFloat(y)||0;
-        }
+        x=parseFloat(x)||0;
+        y=parseFloat(y)||0;
         return x>y?dir:x<y?-dir:0;
       }
       
