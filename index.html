@@ -474,7 +474,7 @@
   }
 
   const coinList = [
-    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
+     "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
     "ADX","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPHA","ALPINE","ALT","AMP",
     "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
     "AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
@@ -497,7 +497,7 @@
     "THETA","TIA","TKO","TLM","TNSR","TON","TRB","TRU","TRUMP","TRX","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA",
     "VANRY","VELODROME","VET","VIC","VIRTUAL","VOXEL","VTHO","W","WAN","WAXP","WCT","WIF","WIN","WLD",
     "WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"
-  ];
+      ];
   const tableBody = document.querySelector('#coinTable tbody');
   let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
@@ -562,36 +562,21 @@
       initRSIHistory(c.name,'1w',row.querySelector('.h-rsi'));
       initRSIHistory(c.name,'1d',row.querySelector('.g-rsi'));
     });
+    applyAllFilters();
   }
 
   function toggleFavorite(name, isFavorite) {
     favorites[name] = isFavorite;
     localStorage.setItem('favorites', JSON.stringify(favorites));
+    applyAllFilters();
   }
 
   function filterFavorites() {
-    const filterEnabled = document.getElementById('favoriteFilter').checked;
-    tableBody.querySelectorAll('tr').forEach(r=>{
-      const coinName = r.cells[2].querySelector('a').textContent;
-      r.style.display = filterEnabled ? (favorites[coinName] ? '' : 'none') : '';
-      if(r.style.display !== 'none') applyOtherFilters(r);
-    });
+    applyAllFilters();
   }
 
   function filterByDipMultiplier() {
-    const multiplier = parseInt(document.getElementById('dipMultiplier').value);
-    tableBody.querySelectorAll('tr').forEach(r => {
-      if (multiplier > 0) {
-        const dipArtisCell = r.cells[5];
-        const dipArtisValue = parseFloat(dipArtisCell.textContent);
-        const maxPercentage = multiplier * 100;
-        const isValid = dipArtisValue > 0 && dipArtisValue <= maxPercentage;
-        r.style.display = isValid ? '' : 'none';
-        if(r.style.display !== 'none') applyOtherFilters(r);
-      } else {
-        r.style.display = '';
-      }
-    });
+    applyAllFilters();
   }
 
   function initRSIHistory(symbol,interval,cell){
@@ -655,35 +640,90 @@
     tableBody.querySelectorAll('tr').forEach(r=>{
       const coinName = r.cells[2].querySelector('a').textContent.toLowerCase();
       r.style.display=coinName.includes(t)?'':'none';
+      if(r.style.display !== 'none') applyOtherFilters(r);
     });
   }
 
   function applyOtherFilters(row) {
+    const favoriteFilterEnabled = document.getElementById('favoriteFilter').checked;
+    const coinName = row.cells[2].querySelector('a').textContent;
+    
+    if(favoriteFilterEnabled && !favorites[coinName]) {
+      row.style.display = 'none';
+      return;
+    }
+    
     const arsiFilterValue = parseInt(document.getElementById('arsiFilter').value);
     const hrsiFilterValue = parseInt(document.getElementById('hrsiFilter').value);
+    const dipMultiplierValue = parseInt(document.getElementById('dipMultiplier').value);
     
     if(arsiFilterValue > 0) {
       const arsiValue = parseFloat(row.cells[7].textContent);
       if(arsiValue < arsiFilterValue) row.style.display = 'none';
     }
+    
     if(hrsiFilterValue > 0) {
       const hrsiValue = parseFloat(row.cells[8].textContent);
       if(hrsiValue < hrsiFilterValue) row.style.display = 'none';
     }
+    
+    if(dipMultiplierValue > 0) {
+      const dipArtisCell = row.cells[5];
+      const dipArtisValue = parseFloat(dipArtisCell.textContent);
+      const maxPercentage = dipMultiplierValue * 100;
+      const isValid = dipArtisValue > 0 && dipArtisValue <= maxPercentage;
+      if(!isValid) row.style.display = 'none';
+    }
   }
 
   function filterByRSI(type, value) {
-    const threshold = parseInt(value);
-    const columnIndex = type === 'a-rsi' ? 7 : 8;
+    applyAllFilters();
+  }
+
+  function applyAllFilters() {
+    const favoriteFilterEnabled = document.getElementById('favoriteFilter').checked;
+    const searchTerm = document.getElementById('coinSearch').value.toLowerCase();
+    const arsiFilterValue = parseInt(document.getElementById('arsiFilter').value);
+    const hrsiFilterValue = parseInt(document.getElementById('hrsiFilter').value);
+    const dipMultiplierValue = parseInt(document.getElementById('dipMultiplier').value);
     
     tableBody.querySelectorAll('tr').forEach(r => {
-      if (threshold > 0) {
-        const rsiValue = parseFloat(r.cells[columnIndex].textContent);
-        r.style.display = rsiValue >= threshold ? '' : 'none';
-        if(r.style.display !== 'none') applyOtherFilters(r);
-      } else {
-        r.style.display = '';
+      const coinName = r.cells[2].querySelector('a').textContent;
+      
+      // Önce favori filtresini uygula
+      if(favoriteFilterEnabled && !favorites[coinName]) {
+        r.style.display = 'none';
+        return;
       }
+      
+      // Arama filtresini uygula
+      if(searchTerm && !coinName.toLowerCase().includes(searchTerm)) {
+        r.style.display = 'none';
+        return;
+      }
+      
+      // Diğer filtreleri uygula
+      let shouldShow = true;
+      
+      if(arsiFilterValue > 0) {
+        const arsiValue = parseFloat(r.cells[7].textContent);
+        if(arsiValue < arsiFilterValue) shouldShow = false;
+      }
+      
+      if(hrsiFilterValue > 0) {
+        const hrsiValue = parseFloat(r.cells[8].textContent);
+        if(hrsiValue < hrsiFilterValue) shouldShow = false;
+      }
+      
+      if(dipMultiplierValue > 0) {
+        const dipArtisCell = r.cells[5];
+        const dipArtisValue = parseFloat(dipArtisCell.textContent);
+        const maxPercentage = dipMultiplierValue * 100;
+        const isValid = dipArtisValue > 0 && dipArtisValue <= maxPercentage;
+        if(!isValid) shouldShow = false;
+      }
+      
+      r.style.display = shouldShow ? '' : 'none';
     });
   }
 
