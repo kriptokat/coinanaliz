@@ -6,7 +6,47 @@
   <title>Coin Performans Tablosu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Yeni Portföy Stilleri */
+    /* Yeni Header Stilleri */
+    .header-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 15px;
+      position: relative;
+    }
+    .title-row {
+      font-size: 16px;
+      color: #00ffc3;
+      text-shadow: 0 0 5px #00ffc3;
+      padding: 10px 15px;
+      margin: 0;
+      text-align: left;
+      border-bottom: 1px solid #00ffc355;
+      position: relative;
+    }
+    .title-row::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #00ffc3, transparent);
+    }
+
+    /* Yükleme Çubuğu Pozisyonu */
+    .progress-container {
+      position: sticky;
+      top: 10px;
+      width: 300px;
+      margin: 10px auto;
+      background: #ffffff;
+      border-radius: 10px;
+      border: 1px solid #00ffc355;
+      z-index: 1000;
+      transition: opacity 0.5s;
+    }
+
+    /* Orijinal Stillerin Tamamı */
     .portfolio-modal {
       display: none;
       position: fixed;
@@ -79,7 +119,7 @@
     }
     .portfolio-button {
       position: absolute;
-      right: 20px;
+      left: 20px;
       top: 20px;
       background: #00ffc3;
       color: #0f2027;
@@ -90,7 +130,6 @@
       font-family: 'Roboto Mono', monospace;
       font-weight: bold;
     }
-    /* Orijinal Stiller */
     * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -99,16 +138,6 @@
       padding: 10px;
       text-align: center;
       overflow-x: hidden;
-    }
-    .progress-container {
-      width: 300px;
-      margin: 15px auto;
-      background: #ffffff;
-      border-radius: 10px;
-      border: 1px solid #00ffc355;
-      position: relative;
-      overflow: hidden;
-      transition: opacity 0.5s;
     }
     .progress-bar {
       width: 0%;
@@ -264,53 +293,26 @@
       color: #e0e0e0;
       cursor: pointer;
     }
-    h2 {
-      color: #00ffc3; 
-      text-shadow: 0 0 5px #00ffc3;
-      font-size: 20px;
-      margin-bottom: 10px;
-      position: relative;
-    }
-    h2::after {
-      content: "";
-      display: block;
-      width: 100px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #00ffc3, transparent);
-      margin: 5px auto;
-    }
     @media (max-width: 768px) { table { font-size: 12px; } }
   </style>
 </head>
 <body>
 
-<h2>🚀 Coin Performans Tablosu</h2>
-<button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
-
-<!-- Portföy Modal -->
-<div class="portfolio-modal" id="portfolioModal">
-  <div class="portfolio-header">
-    <h3>Portföy Yönetimi</h3>
-    <span class="portfolio-close" onclick="togglePortfolio()">&times;</span>
-  </div>
-  <form id="portfolioForm" onsubmit="addToPortfolio(event)">
-    <select id="coinSelect" required>
-      <option value="" disabled selected>Coin Seç</option>
-    </select>
-    <input type="number" id="amountInput" step="0.001" placeholder="Miktar" required>
-    <button type="submit">Ekle</button>
-  </form>
-  <div class="portfolio-list" id="portfolioList"></div>
-  <div class="portfolio-total">
-    Toplam Değer: <span id="portfolioTotal">0</span> $
-  </div>
-</div>
-
+<!-- Yükleme Çubuğu En Üstte -->
 <div class="progress-container">
   <div class="progress-bar"></div>
   <div class="progress-text">%0 Yüklendi</div>
 </div>
 
+<!-- Yeni Başlık Satırı -->
+<div class="header-container">
+  <div class="title-row">🚀 Coin Performans Tablosu</div>
+</div>
+
+<!-- Portföy Butonu -->
+<button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
+
+<!-- Tablo Container -->
 <div class="table-container">
   <div class="table-wrapper">
     <table id="coinTable">
@@ -375,6 +377,25 @@
       </thead>
       <tbody></tbody>
     </table>
+  </div>
+</div>
+
+<!-- Portföy Modal -->
+<div class="portfolio-modal" id="portfolioModal">
+  <div class="portfolio-header">
+    <h3>Portföy Yönetimi</h3>
+    <span class="portfolio-close" onclick="togglePortfolio()">&times;</span>
+  </div>
+  <form id="portfolioForm" onsubmit="addToPortfolio(event)">
+    <select id="coinSelect" required>
+      <option value="" disabled selected>Coin Seç</option>
+    </select>
+    <input type="number" id="amountInput" step="0.001" placeholder="Miktar" required>
+    <button type="submit">Ekle</button>
+  </form>
+  <div class="portfolio-list" id="portfolioList"></div>
+  <div class="portfolio-total">
+    Toplam Değer: <span id="portfolioTotal">0</span> $
   </div>
 </div>
 
@@ -474,7 +495,7 @@
   }
 
   const coinList = [
-     "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
+    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
     "ADX","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPHA","ALPINE","ALT","AMP",
     "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
     "AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
