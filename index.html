@@ -253,6 +253,17 @@
       background: #1c2c3c;
       color: #e0e0e0;
     }
+    .dip-multiplier-select {
+      margin-top: 3px;
+      padding: 4px;
+      font-size: 12px;
+      width: 60px;
+      border: 1px solid #00ffc3;
+      border-radius: 3px;
+      background: #1c2c3c;
+      color: #e0e0e0;
+      cursor: pointer;
+    }
     h2 {
       color: #00ffc3; 
       text-shadow: 0 0 5px #00ffc3;
@@ -322,9 +333,12 @@
           <th onclick="sortTable(4)">Güncel Fiyat</th>
           <th onclick="sortTable(5)">
             Dipten Artış<br>
-            <input type="checkbox" id="dipArtisFilter" 
-                   onclick="event.stopPropagation()"
-                   onchange="filterByDipArtis()">
+            <select id="dipMultiplier" class="dip-multiplier-select" onchange="filterByDipMultiplier()" onclick="event.stopPropagation()">
+              <option value="0">Tümü</option>
+              <option value="5">5x</option>
+              <option value="10">10x</option>
+              <option value="15">15x</option>
+            </select>
           </th>
 <th onclick="sortTable(6)">
   24s Değişim<br>
@@ -448,29 +462,7 @@
   }
 
   const coinList = [
-    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
-    "ADX","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPHA","ALPINE","ALT","AMP",
-    "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
-    "AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
-    "BEAMX","BEL","BERA","BICO","BIFI","BIGTIME","BIO","BLUR","BMT","BNB","BNSOL","BNT","BOME","BONK","BROCCOLI714",
-    "BSW","BTC","BTTC","C98","CAKE","CATI","CELO","CELR","CETUS","CFX","CGPT","CHESS","CHR","CHZ","CITY","CKB",
-    "COMP","COOKIE","COS","COTI","COW","CRV","CTK","CTSI","CVC","CVX","CYBER","D","DASH","DATA","DCR","DEGO","DENT",
-    "DEXE","DF","DGB","DIA","DODO","DOGE","DOGS","DOT","DUSK","DYDX","DYM","EDU","EGLD","EIGEN","ENA","ENJ","ENS","EOS",
-    "EPIC","ETC","ETH","ETHFI","FARM","FET","FIDA","FIL","FIO","FIS","FLM","FLOKI","FLOW","FLUX","FORM","FORTH",
-    "FTT","FUN","FXS","G","GALA","GAS","GHST","GLM","GLMR","GMT","GMX","GNO","GNS","GPS","GRT","GTC","GUN","HBAR","HEI",
-    "HFT","HIFI","HIGH","HIVE","HMSTR","HOOK","HOT","HYPER","ICP","ICX","ID","IDEX","ILV","IMX","INIT","INJ","IO","IOST",
-    "IOTA","IOTX","IQ","JASMY","JOE","JST","JTO","JUP","JUV","KAIA","KAITO","KAVA","KDA","KERNEL","KMD","KMNO","KNC","KSM",
-    "LAYER","LAZIO","LDO","LEVER","LINK","LISTA","LOKA","LPT","LQTY","LRC","LSK","LTC","LTO","LUMIA","LUNA","LUNC","MAGIC",
-    "MANA","MANTA","MASK","MAV","MBL","MBOX","MDT","ME","MEME","METIS","MINA","MKR","MLN","MOVE","MOVR","MTL","MUBARAK",
-    "NEAR","NEIRO","NEO","NEXO","NFP","NIL","NKN","NMR","NOT","NTRN","OG","OGN","OM","OMNI","ONDO","ONE","ONG","ONT","OP",
-    "ORCA","ORDI","OSMO","OXT","PARTI","PDA","PENDLE","PENGU","PEOPLE","PEPE","PERP","PHA","PHB","PIVX","PIXEL","PNUT",
-    "POL","POLYX","POND","PORTAL","PORTO","POWR","PROM","PSG","PUNDIX","PYR","PYTH","QI","QKC","QNT","QTUM","QUICK","RAD",
-    "RARE","RAY","RDNT","RED","REI","RENDER","REQ","REZ","RIF","RLC","RONIN","ROSE","RPL","RSR","RUNE","RVN","S","SAGA","SAND",
-    "SANTOS","SC","SCR","SCRT","SEI","SFP","SHELL","SHIB","SIGN","SKL","SLF","SLP","SNX","SOL","SOLV","SPELL","SSV","STEEM","STG",
-    "STO","STORJ","STPT","STRAX","STRK","STX","SUI","SUN","SUPER","SUSHI","SXP","SYN","SXT","SYRUP","SYS","T","TAO","TFUEL","THE",
-    "THETA","TIA","TKO","TLM","TNSR","TON","TRB","TRU","TRUMP","TRX","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA",
-    "VANRY","VELODROME","VET","VIC","VIRTUAL","VOXEL","VTHO","W","WAN","WAXP","WCT","WIF","WIN","WLD",
-    "WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"
+    "BTC","BTTC","C98","CAKE","CATI","CELO","CELR","CETUS","CFX","CGPT","CHESS","CHR","CHZ","CITY","CKB"
   ];
   const tableBody = document.querySelector('#coinTable tbody');
   let sortDirection = Array(9).fill(true);
@@ -552,13 +544,14 @@
     });
   }
 
-  function filterByDipArtis() {
-    const filterEnabled = document.getElementById('dipArtisFilter').checked;
+  function filterByDipMultiplier() {
+    const multiplier = parseInt(document.getElementById('dipMultiplier').value);
     tableBody.querySelectorAll('tr').forEach(r => {
-      if (filterEnabled) {
+      if (multiplier > 0) {
         const dipArtisCell = r.cells[5];
         const dipArtisValue = parseFloat(dipArtisCell.textContent);
-        const isValid = dipArtisValue > 0 && dipArtisValue < 1001;
+        const maxPercentage = multiplier * 100;
+        const isValid = dipArtisValue > 0 && dipArtisValue <= maxPercentage;
         r.style.display = isValid ? '' : 'none';
         if(r.style.display !== 'none') applyOtherFilters(r);
       } else {
