@@ -253,7 +253,7 @@
       background: #1c2c3c;
       color: #e0e0e0;
     }
-    .dip-multiplier-select {
+    .dip-multiplier-select, .rsi-select {
       margin-top: 3px;
       padding: 4px;
       font-size: 12px;
@@ -348,15 +348,27 @@
 </th>
           <th onclick="sortTable(7)">
             A‑RSI<br>
-            <input type="checkbox" id="arsiFilter" 
-                   onclick="event.stopPropagation()"
-                   onchange="filterByARSI()">
+            <select id="arsiFilter" class="rsi-select" onchange="filterByRSI('a-rsi', this.value)" onclick="event.stopPropagation()">
+              <option value="0">Tümü</option>
+              <option value="30">30+</option>
+              <option value="40">40+</option>
+              <option value="50">50+</option>
+              <option value="60">60+</option>
+              <option value="70">70+</option>
+              <option value="80">80+</option>
+            </select>
           </th>
           <th onclick="sortTable(8)">
             H‑RSI<br>
-            <input type="checkbox" id="hrsiFilter" 
-                   onclick="event.stopPropagation()"
-                   onchange="filterByHRSI()">
+            <select id="hrsiFilter" class="rsi-select" onchange="filterByRSI('h-rsi', this.value)" onclick="event.stopPropagation()">
+              <option value="0">Tümü</option>
+              <option value="30">30+</option>
+              <option value="40">40+</option>
+              <option value="50">50+</option>
+              <option value="60">60+</option>
+              <option value="70">70+</option>
+              <option value="80">80+</option>
+            </select>
           </th>
           <th onclick="sortTable(9)">G‑RSI</th>
         </tr>
@@ -462,7 +474,29 @@
   }
 
   const coinList = [
-    "BTC","BTTC","C98","CAKE","CATI","CELO","CELR","CETUS","CFX","CGPT","CHESS","CHR","CHZ","CITY","CKB"
+    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
+    "ADX","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPHA","ALPINE","ALT","AMP",
+    "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
+    "AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
+    "BEAMX","BEL","BERA","BICO","BIFI","BIGTIME","BIO","BLUR","BMT","BNB","BNSOL","BNT","BOME","BONK","BROCCOLI714",
+    "BSW","BTC","BTTC","C98","CAKE","CATI","CELO","CELR","CETUS","CFX","CGPT","CHESS","CHR","CHZ","CITY","CKB",
+    "COMP","COOKIE","COS","COTI","COW","CRV","CTK","CTSI","CVC","CVX","CYBER","D","DASH","DATA","DCR","DEGO","DENT",
+    "DEXE","DF","DGB","DIA","DODO","DOGE","DOGS","DOT","DUSK","DYDX","DYM","EDU","EGLD","EIGEN","ENA","ENJ","ENS","EOS",
+    "EPIC","ETC","ETH","ETHFI","FARM","FET","FIDA","FIL","FIO","FIS","FLM","FLOKI","FLOW","FLUX","FORM","FORTH",
+    "FTT","FUN","FXS","G","GALA","GAS","GHST","GLM","GLMR","GMT","GMX","GNO","GNS","GPS","GRT","GTC","GUN","HBAR","HEI",
+    "HFT","HIFI","HIGH","HIVE","HMSTR","HOOK","HOT","HYPER","ICP","ICX","ID","IDEX","ILV","IMX","INIT","INJ","IO","IOST",
+    "IOTA","IOTX","IQ","JASMY","JOE","JST","JTO","JUP","JUV","KAIA","KAITO","KAVA","KDA","KERNEL","KMD","KMNO","KNC","KSM",
+    "LAYER","LAZIO","LDO","LEVER","LINK","LISTA","LOKA","LPT","LQTY","LRC","LSK","LTC","LTO","LUMIA","LUNA","LUNC","MAGIC",
+    "MANA","MANTA","MASK","MAV","MBL","MBOX","MDT","ME","MEME","METIS","MINA","MKR","MLN","MOVE","MOVR","MTL","MUBARAK",
+    "NEAR","NEIRO","NEO","NEXO","NFP","NIL","NKN","NMR","NOT","NTRN","OG","OGN","OM","OMNI","ONDO","ONE","ONG","ONT","OP",
+    "ORCA","ORDI","OSMO","OXT","PARTI","PDA","PENDLE","PENGU","PEOPLE","PEPE","PERP","PHA","PHB","PIVX","PIXEL","PNUT",
+    "POL","POLYX","POND","PORTAL","PORTO","POWR","PROM","PSG","PUNDIX","PYR","PYTH","QI","QKC","QNT","QTUM","QUICK","RAD",
+    "RARE","RAY","RDNT","RED","REI","RENDER","REQ","REZ","RIF","RLC","RONIN","ROSE","RPL","RSR","RUNE","RVN","S","SAGA","SAND",
+    "SANTOS","SC","SCR","SCRT","SEI","SFP","SHELL","SHIB","SIGN","SKL","SLF","SLP","SNX","SOL","SOLV","SPELL","SSV","STEEM","STG",
+    "STO","STORJ","STPT","STRAX","STRK","STX","SUI","SUN","SUPER","SUSHI","SXP","SYN","SXT","SYRUP","SYS","T","TAO","TFUEL","THE",
+    "THETA","TIA","TKO","TLM","TNSR","TON","TRB","TRU","TRUMP","TRX","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA",
+    "VANRY","VELODROME","VET","VIC","VIRTUAL","VOXEL","VTHO","W","WAN","WAXP","WCT","WIF","WIN","WLD",
+    "WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"
   ];
   const tableBody = document.querySelector('#coinTable tbody');
   let sortDirection = Array(9).fill(true);
@@ -625,38 +659,27 @@
   }
 
   function applyOtherFilters(row) {
-    const arsiFilterEnabled = document.getElementById('arsiFilter').checked;
-    const hrsiFilterEnabled = document.getElementById('hrsiFilter').checked;
+    const arsiFilterValue = parseInt(document.getElementById('arsiFilter').value);
+    const hrsiFilterValue = parseInt(document.getElementById('hrsiFilter').value);
     
-    if(arsiFilterEnabled) {
+    if(arsiFilterValue > 0) {
       const arsiValue = parseFloat(row.cells[7].textContent);
-      if(arsiValue < 60) row.style.display = 'none';
+      if(arsiValue < arsiFilterValue) row.style.display = 'none';
     }
-    if(hrsiFilterEnabled) {
+    if(hrsiFilterValue > 0) {
       const hrsiValue = parseFloat(row.cells[8].textContent);
-      if(hrsiValue < 60) row.style.display = 'none';
+      if(hrsiValue < hrsiFilterValue) row.style.display = 'none';
     }
   }
 
-  function filterByARSI(){
-    const filterEnabled = document.getElementById('arsiFilter').checked;
-    tableBody.querySelectorAll('tr').forEach(r=>{
-      if(filterEnabled) {
-        const arsiValue = parseFloat(r.cells[7].textContent);
-        r.style.display = arsiValue >= 60 ? '' : 'none';
-        if(r.style.display !== 'none') applyOtherFilters(r);
-      } else {
-        r.style.display = '';
-      }
-    });
-  }
-
-  function filterByHRSI(){
-    const filterEnabled = document.getElementById('hrsiFilter').checked;
-    tableBody.querySelectorAll('tr').forEach(r=>{
-      if(filterEnabled) {
-        const hrsiValue = parseFloat(r.cells[8].textContent);
-        r.style.display = hrsiValue >= 60 ? '' : 'none';
+  function filterByRSI(type, value) {
+    const threshold = parseInt(value);
+    const columnIndex = type === 'a-rsi' ? 7 : 8;
+    
+    tableBody.querySelectorAll('tr').forEach(r => {
+      if (threshold > 0) {
+        const rsiValue = parseFloat(r.cells[columnIndex].textContent);
+        r.style.display = rsiValue >= threshold ? '' : 'none';
         if(r.style.display !== 'none') applyOtherFilters(r);
       } else {
         r.style.display = '';
