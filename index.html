@@ -348,9 +348,11 @@
             Dipten Artış<br>
             <select id="dipMultiplier" class="dip-multiplier-select" onchange="filterByDipMultiplier()" onclick="event.stopPropagation()">
               <option value="0">Tümü</option>
-              <option value="5">5x</option>
-              <option value="10">10x</option>
-              <option value="15">15x</option>
+              <option value="5">0x-5x</option>
+              <option value="10">5x-10x</option>
+              <option value="20">10x-20x</option>
+              <option value="50">20x-50x</option>
+              <option value="200">50x-200x</option>
             </select>
           </th>
 <th onclick="sortTable(6)">
@@ -574,7 +576,7 @@
     "THETA","TIA","TKO","TLM","TNSR","TON","TRB","TRU","TRUMP","TRX","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA",
     "VANRY","VELODROME","VET","VIC","VIRTUAL","VOXEL","VTHO","W","WAN","WAXP","WCT","WIF","WIN","WLD",
     "WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"
-      ];
+         ];
   const tableBody = document.querySelector('#coinTable tbody');
   let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
@@ -749,8 +751,17 @@
     if(dipMultiplierValue > 0) {
       const dipArtisCell = row.cells[5];
       const dipArtisValue = parseFloat(dipArtisCell.textContent);
-      const maxPercentage = dipMultiplierValue * 100;
-      const isValid = dipArtisValue > 0 && dipArtisValue <= maxPercentage;
+      let minPercentage = 0, maxPercentage = 0;
+      
+      switch(dipMultiplierValue) {
+        case 5: minPercentage = 0; maxPercentage = 500; break;
+        case 10: minPercentage = 500; maxPercentage = 1000; break;
+        case 20: minPercentage = 1000; maxPercentage = 2000; break;
+        case 50: minPercentage = 2000; maxPercentage = 5000; break;
+        case 200: minPercentage = 5000; maxPercentage = 20000; break;
+      }
+      
+      const isValid = dipArtisValue > minPercentage && dipArtisValue <= maxPercentage;
       if(!isValid) row.style.display = 'none';
     }
   }
@@ -797,8 +808,17 @@
       if(dipMultiplierValue > 0) {
         const dipArtisCell = r.cells[5];
         const dipArtisValue = parseFloat(dipArtisCell.textContent);
-        const maxPercentage = dipMultiplierValue * 100;
-        const isValid = dipArtisValue > 0 && dipArtisValue <= maxPercentage;
+        let minPercentage = 0, maxPercentage = 0;
+        
+        switch(dipMultiplierValue) {
+          case 5: minPercentage = 0; maxPercentage = 500; break;
+          case 10: minPercentage = 500; maxPercentage = 1000; break;
+          case 20: minPercentage = 1000; maxPercentage = 2000; break;
+          case 50: minPercentage = 2000; maxPercentage = 5000; break;
+          case 200: minPercentage = 5000; maxPercentage = 20000; break;
+        }
+        
+        const isValid = dipArtisValue > minPercentage && dipArtisValue <= maxPercentage;
         if(!isValid) shouldShow = false;
       }
       
