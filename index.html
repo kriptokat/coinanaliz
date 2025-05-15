@@ -8,11 +8,11 @@
   <style>
     /* Yeni Header Stilleri */
     .header-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 0 15px;
-      position: relative;
-    }
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 15px;
+  position: relative; /* Bu sayede içindeki absolute pozisyonlu elementler buna göre konumlanır */
+}
     .title-row {
       font-size: 16px;
       color: #00ffc3;
@@ -117,19 +117,20 @@
       font-weight: bold;
       color: #00ffc3;
     }
-    .portfolio-button {
-      position: absolute;
-      left: 20px;
-      top: 20px;
-      background: #00ffc3;
-      color: #0f2027;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: 'Roboto Mono', monospace;
-      font-weight: bold;
-    }
+.portfolio-button {
+  background: #00ffc3;
+  color: #0f2027;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: 'Roboto Mono', monospace;
+  font-weight: bold;
+  position: absolute;
+  right: 20px;
+  top: 4px; /* Bu değeri daha küçük bir sayıyla değiştirin */
+  z-index: 1;
+}
     * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -307,10 +308,10 @@
 <!-- Yeni Başlık Satırı -->
 <div class="header-container">
   <div class="title-row">🚀 Coin Performans Tablosu</div>
-</div>
-
 <!-- Portföy Butonu -->
 <button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
+</div>
+
 
 <!-- Tablo Container -->
 <div class="table-container">
