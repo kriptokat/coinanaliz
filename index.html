@@ -286,7 +286,7 @@
       margin-top: 3px;
       padding: 4px;
       font-size: 12px;
-      width: 60px;
+      width: 70px;
       border: 1px solid #00ffc3;
       border-radius: 3px;
       background: #1c2c3c;
@@ -332,14 +332,17 @@
 <input id="dipMonths" type="number" min="1" value="18" class="dip-input" onclick="event.stopPropagation()" oninput="updateTable()" onchange="updateTable()">
             Aylık Dip Fiyatı<br>
           </th>
-          <th onclick="sortTable(4)">
-            Fiyat<br>
-            <select id="currencySelect" class="currency-select" onchange="updateCurrency()" onclick="event.stopPropagation()">
-              <option value="USD">USD</option>
-              <option value="TRY">TRY</option>
-              <option value="EUR">EUR</option>
-            </select>
-          </th>
+<th onclick="sortTable(4)">
+  Fiyat<br>
+  <select id="currencySelect" class="currency-select" onchange="updateCurrency()" onclick="event.stopPropagation()">
+    <option value="USD">USD</option>
+    <option value="TRY">TRY</option>
+    <option value="EUR">EUR</option>
+    <option value="GBP">GBP</option>
+    <option value="JPY">JPY</option>
+    <option value="CNY">CNY</option>
+  </select>
+</th>
           <th onclick="sortTable(5)">
             Dipten Artış<br>
             <select id="dipMultiplier" class="dip-multiplier-select" onchange="filterByDipMultiplier()" onclick="event.stopPropagation()">
@@ -409,7 +412,7 @@
 <script>
   // Portföy Fonksiyonları
   let portfolio = JSON.parse(localStorage.getItem('portfolio')) || {};
-  let exchangeRates = { USD: 1, TRY: 1, EUR: 1 };
+  let exchangeRates = { USD: 1, TRY: 1, EUR: 1, GBP: 1, JPY: 1, CNY: 1 };
   let currentCurrency = 'USD';
   
   function togglePortfolio() {
@@ -484,15 +487,21 @@
     fetch('https://api.exchangerate-api.com/v4/latest/USD')
       .then(response => response.json())
       .then(data => {
-        exchangeRates.TRY = data.rates.TRY;
-        exchangeRates.EUR = data.rates.EUR;
+        exchangeRates.TRY = data.rates.TRY || 32.0;
+        exchangeRates.EUR = data.rates.EUR || 0.92;
+        exchangeRates.GBP = data.rates.GBP || 0.79;
+        exchangeRates.JPY = data.rates.JPY || 151.0;
+        exchangeRates.CNY = data.rates.CNY || 7.23;
         updateCurrency();
       })
       .catch(error => {
         console.error('Döviz kuru alınırken hata:', error);
-        // Varsayılan değerler
+        // Varsayılan değerler (API çalışmazsa kullanılacak)
         exchangeRates.TRY = 32.0;
         exchangeRates.EUR = 0.92;
+        exchangeRates.GBP = 0.79;
+        exchangeRates.JPY = 151.0;
+        exchangeRates.CNY = 7.23;
         updateCurrency();
       });
   }
@@ -541,7 +550,7 @@
   }
 
   const coinList = [
-     "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
+    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
     "ADX","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPHA","ALPINE","ALT","AMP",
     "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
     "AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
