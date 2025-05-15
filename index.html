@@ -334,22 +334,10 @@
           </th>
           <th onclick="sortTable(4)">
             Fiyat<br>
-            <select id="currencySelect" class="currency-select" onchange="changeCurrency()" onclick="event.stopPropagation()">
+            <select id="currencySelect" class="currency-select" onchange="updateCurrency()" onclick="event.stopPropagation()">
               <option value="USD">USD</option>
               <option value="TRY">TRY</option>
               <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
-              <option value="JPY">JPY</option>
-              <option value="CAD">CAD</option>
-              <option value="AUD">AUD</option>
-              <option value="CHF">CHF</option>
-              <option value="CNY">CNY</option>
-              <option value="RUB">RUB</option>
-              <option value="BRL">BRL</option>
-              <option value="INR">INR</option>
-              <option value="KRW">KRW</option>
-              <option value="MXN">MXN</option>
-              <option value="SGD">SGD</option>
             </select>
           </th>
           <th onclick="sortTable(5)">
@@ -414,13 +402,15 @@
   </form>
   <div class="portfolio-list" id="portfolioList"></div>
   <div class="portfolio-total">
-    Toplam Değer: <span id="portfolioTotal">0</span> $
+    Toplam Değer: <span id="portfolioTotal">0</span> <span id="portfolioCurrency">USD</span>
   </div>
 </div>
 
 <script>
   // Portföy Fonksiyonları
   let portfolio = JSON.parse(localStorage.getItem('portfolio')) || {};
+  let exchangeRates = { USD: 1, TRY: 1, EUR: 1 };
+  let currentCurrency = 'USD';
   
   function togglePortfolio() {
     const modal = document.getElementById('portfolioModal');
@@ -460,6 +450,7 @@
   function updatePortfolioDisplay() {
     const list = document.getElementById('portfolioList');
     const totalElement = document.getElementById('portfolioTotal');
+    const currencyElement = document.getElementById('portfolioCurrency');
     list.innerHTML = '';
     let total = 0;
     
@@ -476,7 +467,7 @@
       item.innerHTML = `
         <span>${coin}</span>
         <div class="portfolio-item-controls">
-          <span>${amount} x ${price}$ = ${(amount * price).toFixed(2)}$</span>
+          <span>${amount} x ${price.toFixed(7)} ${currentCurrency} = ${(amount * price).toFixed(2)} ${currentCurrency}</span>
           <span class="delete-portfolio-item" onclick="deletePortfolioItem('${coin}')">×</span>
         </div>
       `;
@@ -485,6 +476,42 @@
     });
     
     totalElement.textContent = total.toFixed(2);
+    currencyElement.textContent = currentCurrency;
+  }
+
+  // Döviz kuru güncelleme fonksiyonu
+  function updateExchangeRates() {
+    fetch('https://api.exchangerate-api.com/v4/latest/USD')
+      .then(response => response.json())
+      .then(data => {
+        exchangeRates.TRY = data.rates.TRY;
+        exchangeRates.EUR = data.rates.EUR;
+        updateCurrency();
+      })
+      .catch(error => {
+        console.error('Döviz kuru alınırken hata:', error);
+        // Varsayılan değerler
+        exchangeRates.TRY = 32.0;
+        exchangeRates.EUR = 0.92;
+        updateCurrency();
+      });
+  }
+
+  // Para birimi değiştirme fonksiyonu
+  function updateCurrency() {
+    currentCurrency = document.getElementById('currencySelect').value;
+    const rate = exchangeRates[currentCurrency];
+    
+    document.querySelectorAll('#coinTable tbody tr').forEach(row => {
+      const priceCell = row.cells[4];
+      const originalPrice = parseFloat(priceCell.getAttribute('data-original-price')) || 0;
+      const convertedPrice = originalPrice * rate;
+      priceCell.textContent = formatNum(convertedPrice, 7);
+    });
+    
+    if(document.getElementById('portfolioModal').style.display === 'block') {
+      updatePortfolioDisplay();
+    }
   }
 
   // Orijinal Scriptler
@@ -494,8 +521,6 @@
   const progressContainer = document.querySelector('.progress-container');
   let loadedCoins = 0;
   let favorites = JSON.parse(localStorage.getItem('favorites')) || {};
-  let exchangeRates = {};
-  let selectedCurrency = 'USD';
 
   function updateProgress() {
     const totalCoins = coinList.length;
@@ -516,7 +541,7 @@
   }
 
   const coinList = [
-    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
+     "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
     "ADX","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPHA","ALPINE","ALT","AMP",
     "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
     "AUCTION","AUDIO","AVA","AVAX","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
@@ -555,74 +580,12 @@
     if(avgL===0) return 100; const rs=avgG/avgL; return 100-(100/(1+rs));
   }
 
-  function fetchExchangeRates() {
-    const apiKey = 'YOUR_API_KEY'; // Buraya bir API key eklemeniz gerekebilir
-    const url = `https://api.exchangerate-api.com/v4/latest/USD`;
-    
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        exchangeRates = data.rates;
-        // Bazı para birimleri için alternatif isimler ekleyelim
-        exchangeRates['USD'] = 1; // USD için 1 ekliyoruz
-      })
-      .catch(error => {
-        console.error('Döviz kuru alınırken hata:', error);
-        // Varsayılan değerler
-        exchangeRates = {
-          USD: 1,
-          TRY: 32.0, // Örnek değer
-          EUR: 0.92, // Örnek değer
-          GBP: 0.79, // Örnek değer
-          JPY: 151.0, // Örnek değer
-          CAD: 1.36, // Örnek değer
-          AUD: 1.52, // Örnek değer
-          CHF: 0.90, // Örnek değer
-          CNY: 7.23, // Örnek değer
-          RUB: 92.0, // Örnek değer
-          BRL: 5.05, // Örnek değer
-          INR: 83.3, // Örnek değer
-          KRW: 1342.0, // Örnek değer
-          MXN: 16.8, // Örnek değer
-          SGD: 1.35 // Örnek değer
-        };
-      });
-  }
-
-  function convertPrice(price, currency) {
-    if (!price || isNaN(price)) return price;
-    const rate = exchangeRates[currency] || 1;
-    return price * rate;
-  }
-
-  function changeCurrency() {
-    selectedCurrency = document.getElementById('currencySelect').value;
-    updatePricesWithSelectedCurrency();
-  }
-
-  function updatePricesWithSelectedCurrency() {
-    const rows = tableBody.querySelectorAll('tr');
-    rows.forEach(row => {
-      const priceCell = row.cells[4];
-      const originalPrice = parseFloat(priceCell.getAttribute('data-original-price')) || 0;
-      const convertedPrice = convertPrice(originalPrice, selectedCurrency);
-      
-      if (selectedCurrency === 'USD') {
-        priceCell.textContent = formatNum(originalPrice, 7);
-      } else {
-        priceCell.textContent = formatNum(convertedPrice, 7);
-      }
-    });
-    
-    // Portföy toplamını da güncelle
-    updatePortfolioDisplay();
-  }
-
   function updateTable() {
     loadedCoins = 0;
     progressContainer.style.display = 'block';
     progressContainer.style.opacity = '1';
     updateProgress();
+    updateExchangeRates();
 
     const months = Math.max(1, parseInt(dipMonths.value)||1);
     fetch('https://api.binance.com/api/v3/ticker/24hr').then(r=>r.json()).then(data=>{
@@ -651,7 +614,7 @@
           <a href="https://tr.tradingview.com/chart/8tydse0K/?symbol=BINANCE%3A${c.name}USDT" target="_blank" class="chart-emoji">📈</a>
         </td>
         <td>${isNaN(c.dip)?'0':formatNum(c.dip,10)}</td>
-        <td data-original-price="${isNaN(c.currentPrice)?'0':c.currentPrice}">${isNaN(c.currentPrice)?'0':formatNum(c.currentPrice,7)}</td>
+        <td data-original-price="${isNaN(c.currentPrice)?'0':c.currentPrice}">${isNaN(c.currentPrice)?'0':formatNum(c.currentPrice * exchangeRates[currentCurrency],7)}</td>
         <td class="${c.dip&&((c.currentPrice-c.dip)/c.dip*100)>0?'green':'red'}">
           ${!isNaN(c.dip)?formatNum((c.currentPrice-c.dip)/c.dip*100,2)+'%':'0'}
         </td>
@@ -668,8 +631,6 @@
       initRSIHistory(c.name,'1d',row.querySelector('.g-rsi'));
     });
     applyAllFilters();
-    // Döviz kurlarını al
-    fetchExchangeRates();
   }
 
   function toggleFavorite(name, isFavorite) {
@@ -719,14 +680,7 @@
       
       const priceCell = row.cells[4];
       priceCell.setAttribute('data-original-price', price);
-      
-      if (selectedCurrency === 'USD') {
-        priceCell.textContent = formatNum(price,7);
-      } else {
-        const convertedPrice = convertPrice(price, selectedCurrency);
-        priceCell.textContent = formatNum(convertedPrice,7);
-      }
-      
+      priceCell.textContent = formatNum(price * exchangeRates[currentCurrency], 7);
       priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
       
       const change=+d.P;
