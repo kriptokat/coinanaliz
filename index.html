@@ -362,8 +362,19 @@
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
           <th onclick="sortTable(3)">
-<input id="dipMonths" type="number" min="1" value="18" class="dip-input" onclick="event.stopPropagation()" oninput="updateTable()" onchange="updateTable()">
             Aylık Dip Fiyatı<br>
+            <select id="dipMonths" class="dip-multiplier-select" onchange="updateTable()" onclick="event.stopPropagation()">
+              <option value="1">1 Ay</option>
+              <option value="3">3 Ay</option>
+              <option value="6">6 Ay</option>
+              <option value="9">9 Ay</option>
+              <option value="12">12 Ay</option>
+              <option value="18" selected>18 Ay</option>
+              <option value="24">24 Ay</option>
+              <option value="36">36 Ay</option>
+              <option value="48">48 Ay</option>
+              <option value="120">120 Ay</option>
+            </select>
           </th>
 <th onclick="sortTable(4)">
   Fiyat<br>
@@ -648,7 +659,7 @@ function updateProgress() {
     updateProgress();
     updateExchangeRates();
 
-    const months = Math.max(1, parseInt(dipMonths.value)||1);
+    const months = parseInt(document.getElementById('dipMonths').value)||1;
     fetch('https://api.binance.com/api/v3/ticker/24hr').then(r=>r.json()).then(data=>{
       const map24 = new Map(data.map(d=>[d.symbol,d]));
       return Promise.all(coinList.map(name=>
@@ -971,7 +982,6 @@ function updateProgress() {
     }
   });
 
-  dipMonths.addEventListener('click',e=>e.stopPropagation()); 
   updateTable();
 </script>
 
