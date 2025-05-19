@@ -3,7 +3,7 @@
 <head>
 <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=E7kXDlAgCj90&format=png&color=000000">
   <meta charset="UTF-8">
-  <title>Coin Performans Tablosu</title>
+  <title>Binance Coin Performans Tablosu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* Yeni Header Stilleri */
@@ -324,6 +324,23 @@
       color: #e0e0e0;
       cursor: pointer;
     }
+    
+    /* Sayaç için yeni stiller */
+    .footer-container {
+      max-width: 1000px;
+      margin: 20px auto 0;
+      padding: 0 15px;
+    }
+    .counter-container {
+      background: rgba(15, 25, 35, 0.95);
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00ffcc66, inset 0 0 10px rgba(0, 255, 195, 0.2);
+      border: 1px solid #00ffc3;
+      padding: 10px;
+      margin-top: 20px;
+      display: inline-block;
+    }
+    
     @media (max-width: 768px) { table { font-size: 12px; } }
   </style>
 </head>
@@ -339,11 +356,10 @@
 
 <!-- Yeni Başlık Satırı -->
 <div class="header-container">
-  <div class="title-row">🚀 Coin Performans Tablosu</div>
+  <div class="title-row">🚀 Binance Coin Performans Tablosu</div>
 <!-- Portföy Butonu -->
 <button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
 </div>
-
 
 <!-- Tablo Container -->
 <div class="table-container">
@@ -451,6 +467,13 @@
       </thead>
       <tbody></tbody>
     </table>
+  </div>
+</div>
+
+<!-- Sayaç Container -->
+<div class="footer-container">
+  <div class="counter-container">
+    <a href="https://info.flagcounter.com/5Xmm"><img src="https://s01.flagcounter.com/count/5Xmm/bg_FFFFFF/txt_000000/border_CCCCCC/columns_8/maxflags_16/viewers_Ziyaretciler/labels_0/pageviews_0/flags_0/percent_0/" alt="Flag Counter" border="0"></a>
   </div>
 </div>
 
