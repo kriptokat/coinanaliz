@@ -326,19 +326,17 @@
     }
     
     /* Sayaç için yeni stiller */
-    .footer-container {
-      max-width: 1000px;
-      margin: 20px auto 0;
-      padding: 0 15px;
-    }
     .counter-container {
       background: rgba(15, 25, 35, 0.95);
-      border-radius: 10px;
+      border-radius: 5px;
       box-shadow: 0 0 15px #00ffcc66, inset 0 0 10px rgba(0, 255, 195, 0.2);
       border: 1px solid #00ffc3;
-      padding: 10px;
-      margin-top: 20px;
+      padding: 5px 10px;
       display: inline-block;
+      position: absolute;
+      left: 750px;
+      top: 2px;
+      z-index: 1;
     }
     
     @media (max-width: 768px) { table { font-size: 12px; } }
@@ -357,8 +355,13 @@
 <!-- Yeni Başlık Satırı -->
 <div class="header-container">
   <div class="title-row">🚀 Binance Coin Performans Tablosu</div>
-<!-- Portföy Butonu -->
-<button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
+  <!-- Sayaç Container -->
+  <div class="counter-container">
+    <div id="sfcjbq4sxejyjwcnf4jug2m4n1qcghq43wg"></div>
+    <script type="text/javascript" src="https://counter4.optistats.ovh/private/counter.js?c=jbq4sxejyjwcnf4jug2m4n1qcghq43wg&down=async" async></script>
+  </div>
+  <!-- Portföy Butonu -->
+  <button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
 </div>
 
 <!-- Tablo Container -->
@@ -468,14 +471,6 @@
       <tbody></tbody>
     </table>
   </div>
-</div>
-
-<!-- Sayaç Container -->
-<br>
-<div>
-<div id="sfcjbq4sxejyjwcnf4jug2m4n1qcghq43wg"></div>
-<script type="text/javascript" src="https://counter4.optistats.ovh/private/counter.js?c=jbq4sxejyjwcnf4jug2m4n1qcghq43wg&down=async" async></script>
-<noscript><a href="https://www.freecounterstat.com" title="free hit counter"><img src="https://counter4.optistats.ovh/private/freecounterstat.php?c=jbq4sxejyjwcnf4jug2m4n1qcghq43wg" border="0" title="free hit counter" alt="free hit counter"></a></noscript>
 </div>
 
 <!-- Portföy Modal -->
