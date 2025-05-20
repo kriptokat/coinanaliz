@@ -95,6 +95,79 @@
       }
     }
 
+    /* LED Panel Stilleri */
+    .led-panel-container {
+      position: absolute;
+      left: 325px;
+      top: 4px;
+      z-index: 1;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .led-panel {
+      display: flex;
+      background-color: transparent;
+      padding: 0;
+      gap: 8px;
+    }
+
+    .led-char {
+      display: grid;
+      grid-template-columns: repeat(5, 2px);
+      grid-template-rows: repeat(7, 2px);
+      gap: 2px;
+    }
+
+    .led-dot {
+      width: 2px;
+      height: 2px;
+      border-radius: 50%;
+      background-color: #111;
+      box-shadow: 0 0 1px #0ff;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .led-on {
+      background-color: #0ff;
+      box-shadow: 0 0 4px #0ff;
+    }
+
+    .led-on.up {
+      background-color: #0f0;
+      box-shadow: 0 0 4px #0f0;
+    }
+
+    .led-on.down {
+      background-color: #f00;
+      box-shadow: 0 0 4px #f00;
+    }
+
+    .led-slide-up {
+      animation: slideUp 0.4s ease;
+    }
+
+    .led-slide-down {
+      animation: slideDown 0.4s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .led-strip {
+      display: flex;
+      gap: 8px;
+    }
+
     /* Orijinal Stillerin Tamamı */
     .portfolio-modal {
       display: none;
@@ -355,6 +428,13 @@
 <!-- Yeni Başlık Satırı -->
 <div class="header-container">
   <div class="title-row">🚀 Binance Coin Performans Tablosu</div>
+  <!-- LED Panel -->
+  <div class="led-panel-container">
+    <div class="led-panel">
+      <div class="led-strip" id="ledLabel"></div>
+      <div class="led-strip" id="ledPrice"></div>
+    </div>
+  </div>
   <!-- Sayaç Container -->
   <div class="counter-container">
     <div id="sfcjbq4sxejyjwcnf4jug2m4n1qcghq43wg"></div>
@@ -493,6 +573,131 @@
 </div>
 
 <script>
+  // LED Panel Fonksiyonları
+  const ledAlphabet = {
+    'A': ["01110","10001","10001","11111","10001","10001","10001"],
+    'B': ["11110","10001","10001","11110","10001","10001","11110"],
+    'C': ["01110","10001","10000","10000","10000","10001","01110"],
+    'D': ["11110","10001","10001","10001","10001","10001","11110"],
+    'E': ["11111","10000","10000","11110","10000","10000","11111"],
+    'F': ["11111","10000","10000","11110","10000","10000","10000"],
+    'G': ["01110","10001","10000","10111","10001","10001","01111"],
+    'H': ["10001","10001","10001","11111","10001","10001","10001"],
+    'I': ["01110","00100","00100","00100","00100","00100","01110"],
+    'K': ["10001","10010","10100","11000","10100","10010","10001"],
+    'L': ["10000","10000","10000","10000","10000","10000","11111"],
+    'N': ["10001","11001","10101","10011","10001","10001","10001"],
+    'O': ["01110","10001","10001","10001","10001","10001","01110"],
+    'P': ["11110","10001","10001","11110","10000","10000","10000"],
+    'R': ["11110","10001","10001","11110","10100","10010","10001"],
+    'S': ["01111","10000","10000","01110","00001","00001","11110"],
+    'T': ["11111","00100","00100","00100","00100","00100","00100"],
+    'U': ["10001","10001","10001","10001","10001","10001","01110"],
+    'V': ["10001","10001","10001","10001","10001","01010","00100"],
+    'Y': ["10001","10001","01010","00100","00100","00100","00100"],
+    ':': ["00000","00100","00000","00000","00100","00000","00000"],
+    '.': ["00000","00000","00000","00000","00000","00100","00100"],
+    '0': ["01110","10001","10011","10101","11001","10001","01110"],
+    '1': ["00100","01100","00100","00100","00100","00100","01110"],
+    '2': ["01110","10001","00001","00010","00100","01000","11111"],
+    '3': ["11110","00001","00001","00110","00001","00001","11110"],
+    '4': ["00010","00110","01010","10010","11111","00010","00010"],
+    '5': ["11111","10000","11110","00001","00001","10001","01110"],
+    '6': ["01110","10000","11110","10001","10001","10001","01110"],
+    '7': ["11111","00001","00010","00100","01000","01000","01000"],
+    '8': ["01110","10001","10001","01110","10001","10001","01110"],
+    '9': ["01110","10001","10001","01111","00001","00001","01110"],
+    ' ': ["00000","00000","00000","00000","00000","00000","00000"]
+  };
+
+  const ledLabelEl = document.getElementById("ledLabel");
+  const ledPriceEl = document.getElementById("ledPrice");
+  let previousLedPrice = null;
+  let previousLedPriceText = "";
+
+  function renderLedText(container, text, prevText = '', direction = '') {
+    container.innerHTML = '';
+    const upperText = text.toUpperCase();
+
+    for (let i = 0; i < upperText.length; i++) {
+      const char = upperText[i];
+      const prevChar = prevText[i];
+      const matrix = ledAlphabet[char] || ledAlphabet[' '];
+      const prevMatrix = ledAlphabet[prevChar] || [];
+
+      const charDiv = document.createElement("div");
+      charDiv.className = "led-char";
+
+      matrix.forEach((row, rowIndex) => {
+        [...row].forEach((dot, colIndex) => {
+          const dotDiv = document.createElement("div");
+          const isOn = dot === '1';
+          const wasOn = prevMatrix[rowIndex] && prevMatrix[rowIndex][colIndex] === '1';
+          dotDiv.className = "led-dot";
+          if (isOn) {
+            dotDiv.classList.add("led-on");
+            if (!wasOn && direction) {
+              dotDiv.classList.add(direction === "up" ? "led-slide-up" : "led-slide-down");
+            }
+            if (direction) dotDiv.classList.add(direction);
+          }
+          charDiv.appendChild(dotDiv);
+        });
+      });
+
+      container.appendChild(charDiv);
+    }
+  }
+
+  async function scrambleLedText(text, container) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:';
+    let result = Array(text.length).fill('');
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+
+    for (let i = 0; i < text.length; i++) {
+      for (let t = 0; t < 4; t++) {
+        result[i] = chars[Math.floor(Math.random() * chars.length)];
+        renderLedText(container, result.join(''));
+        await delay(40);
+      }
+      result[i] = text[i];
+      renderLedText(container, result.join(''));
+      await delay(80);
+    }
+  }
+
+  async function ledMainLoop() {
+    await scrambleLedText("BITCOIN:", ledLabelEl);
+
+    while (true) {
+      let text = "";
+      let direction = "up";
+
+      try {
+        const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
+        const data = await res.json();
+        const price = Math.floor(parseFloat(data.price));
+        text = price.toString();
+
+        if (previousLedPrice !== null) {
+          direction = price > previousLedPrice ? "up" : price < previousLedPrice ? "down" : '';
+        }
+
+        previousLedPrice = price;
+      } catch {
+        text = "ERR";
+      }
+
+      renderLedText(ledPriceEl, text, previousLedPriceText, direction);
+      previousLedPriceText = text;
+
+      await new Promise(r => setTimeout(r, 1000));
+    }
+  }
+
+  // LED paneli başlat
+  ledMainLoop();
+
   // Portföy Fonksiyonları
   let portfolio = JSON.parse(localStorage.getItem('portfolio')) || {};
   let exchangeRates = { USD: 1, TRY: 1, EUR: 1, GBP: 1, JPY: 1, CNY: 1 };
