@@ -306,12 +306,11 @@
     thead th:nth-child(3), tbody td:nth-child(3) { width: 90px; }
     thead th:nth-child(4), tbody td:nth-child(4) { width: 90px; }
     thead th:nth-child(5), tbody td:nth-child(5) { width: 90px; }
-    thead th:nth-child(6), tbody td:nth-child(6) { width: 90px; }
+    thead th:nth-child(6), tbody td:nth-child(6) { width: 70px; }
     thead th:nth-child(7), tbody td:nth-child(7) { width: 70px; }
-    thead th:nth-child(8), tbody td:nth-child(8) { width: 70px; }
+    thead th:nth-child(8), tbody td:nth-child(8) { width: 60px; }
     thead th:nth-child(9), tbody td:nth-child(9) { width: 60px; }
     thead th:nth-child(10), tbody td:nth-child(10) { width: 60px; }
-    thead th:nth-child(11), tbody td:nth-child(11) { width: 60px; }
     thead th:nth-child(3), tbody td:nth-child(3) {
       white-space: nowrap;
       overflow: hidden;
@@ -462,21 +461,6 @@
             <input id="coinSearch" type="text" class="search-input" placeholder="Ara..." onkeyup="searchCoin()" onclick="event.stopPropagation()">
           </th>
           <th onclick="sortTable(3)">
-            Aylık Tepe Fiyatı<br>
-            <select id="dipMonths" class="dip-multiplier-select" onchange="updateTable()" onclick="event.stopPropagation()">
-              <option value="1">1 Ay</option>
-              <option value="3">3 Ay</option>
-              <option value="6">6 Ay</option>
-              <option value="9">9 Ay</option>
-              <option value="12">12 Ay</option>
-              <option value="18">18 Ay</option>
-              <option value="24">24 Ay</option>
-              <option value="36">36 Ay</option>
-              <option value="48">48 Ay</option>
-              <option value="120" selected>120 Ay</option>
-            </select>
-          </th>
-          <th onclick="sortTable(4)">
             Aylık Dip Fiyatı<br>
             <select id="dipMonths" class="dip-multiplier-select" onchange="updateTable()" onclick="event.stopPropagation()">
               <option value="1">1 Ay</option>
@@ -491,7 +475,7 @@
               <option value="120">120 Ay</option>
             </select>
           </th>
-<th onclick="sortTable(5)">
+<th onclick="sortTable(4)">
   Fiyat<br>
   <select id="currencySelect" class="currency-select" onchange="updateCurrency()" onclick="event.stopPropagation()">
     <option value="USD">USD</option>
@@ -502,7 +486,7 @@
     <option value="CNY">CNY</option>
   </select>
 </th>
-          <th onclick="sortTable(6)">
+          <th onclick="sortTable(5)">
             Dipten Artış<br>
             <select id="dipMultiplier" class="dip-multiplier-select" onchange="filterByDipMultiplier()" onclick="event.stopPropagation()">
               <option value="0">Tümü</option>
@@ -514,13 +498,13 @@
               <option value="201">200x+</option>
             </select>
           </th>
-<th onclick="sortTable(7)">
+<th onclick="sortTable(6)">
   24s Değişim<br>
   <input type="checkbox" class="filter-checkbox" 
          id="autoSortCheckbox" 
          onclick="event.stopPropagation()">
 </th>
-          <th onclick="sortTable(8)">
+          <th onclick="sortTable(7)">
             A‑RSI<br>
             <select id="arsiFilter" class="rsi-select" onchange="filterByRSI('a-rsi', this.value)" onclick="event.stopPropagation()">
               <option value="0">Tümü</option>
@@ -534,7 +518,7 @@
               <option value="90+">90+</option>
             </select>
           </th>
-          <th onclick="sortTable(9)">
+          <th onclick="sortTable(8)">
             H‑RSI<br>
             <select id="hrsiFilter" class="rsi-select" onchange="filterByRSI('h-rsi', this.value)" onclick="event.stopPropagation()">
               <option value="0">Tümü</option>
@@ -548,7 +532,7 @@
               <option value="90+">90+</option>
             </select>
           </th>
-          <th onclick="sortTable(10)">
+          <th onclick="sortTable(9)">
             G‑RSI<br>
             <select id="grsiFilter" class="rsi-select" onchange="filterByRSI('g-rsi', this.value)" onclick="event.stopPropagation()">
               <option value="0">Tümü</option>
@@ -766,7 +750,7 @@
         [...document.querySelectorAll('.coin-name a')]
           .find(a => a.textContent === coin)
           ?.closest('tr')
-          .querySelector('td:nth-child(6)').textContent
+          .querySelector('td:nth-child(5)').textContent
       ) || 0;
       
       const item = document.createElement('div');
@@ -816,7 +800,7 @@
     const rate = exchangeRates[currentCurrency];
     
     document.querySelectorAll('#coinTable tbody tr').forEach(row => {
-      const priceCell = row.cells[5];
+      const priceCell = row.cells[4];
       const originalPrice = parseFloat(priceCell.getAttribute('data-original-price')) || 0;
       const convertedPrice = originalPrice * rate;
       priceCell.textContent = formatNum(convertedPrice, 7);
@@ -878,7 +862,7 @@ function updateProgress() {
     "WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"
          ];
   const tableBody = document.querySelector('#coinTable tbody');
-  let sortDirection = Array(11).fill(true);
+  let sortDirection = Array(9).fill(true);
   const RSI_PERIOD = 14, RSI_HIST_DAILY = 1000, RSI_HIST_OTHER = 500;
   const rsiHistory = {};
   const previousPrices = {};
@@ -906,11 +890,9 @@ function updateProgress() {
         fetch(`https://api.binance.com/api/v3/klines?symbol=${name}USDT&interval=1M&limit=${months+1}`).then(r=>r.json()).then(klines=>{
           loadedCoins++;
           updateProgress();
-          klines.pop(); 
-          const dipArr=klines.map(k=>+k[3]); const dip=dipArr.length?Math.min(...dipArr):NaN;
-          const peakArr=klines.map(k=>+k[2]); const peak=peakArr.length?Math.max(...peakArr):NaN;
+          klines.pop(); const dipArr=klines.map(k=>+k[3]); const dip=dipArr.length?Math.min(...dipArr):NaN;
           const o=map24.get(name+'USDT')||{};
-          return {name,dip,peak,currentPrice:+o.lastPrice||NaN,priceChange:+o.priceChangePercent||NaN};
+          return {name,dip,currentPrice:+o.lastPrice||NaN,priceChange:+o.priceChangePercent||NaN};
         })
       ));
     }).then(list=>{renderTable(list);setupWebSocket();});
@@ -927,7 +909,6 @@ function updateProgress() {
           <a href="https://www.binance.com/en-TR/trade/${c.name}_USDT" target="_blank">${c.name}</a>
           <a href="https://tr.tradingview.com/chart/8tydse0K/?symbol=BINANCE%3A${c.name}USDT" target="_blank" class="chart-emoji">📈</a>
         </td>
-        <td>${isNaN(c.peak)?'0':formatNum(c.peak,10)}</td>
         <td>${isNaN(c.dip)?'0':formatNum(c.dip,10)}</td>
         <td data-original-price="${isNaN(c.currentPrice)?'0':c.currentPrice}">${isNaN(c.currentPrice)?'0':formatNum(c.currentPrice * exchangeRates[currentCurrency],7)}</td>
         <td class="${c.dip&&((c.currentPrice-c.dip)/c.dip*100)>0?'green':'red'}">
@@ -993,14 +974,14 @@ function updateProgress() {
       const oldPrice = previousPrices[nm] || 0;
       previousPrices[nm] = price;
       
-      const priceCell = row.cells[5];
+      const priceCell = row.cells[4];
       priceCell.setAttribute('data-original-price', price);
       priceCell.textContent = formatNum(price * exchangeRates[currentCurrency], 7);
       priceCell.className = price > oldPrice ? 'green' : price < oldPrice ? 'red' : '';
       
       const change=+d.P;
-      row.cells[7].textContent=formatNum(change,2)+'%'; 
-      row.cells[7].className=change>=0?'green':'red';
+      row.cells[6].textContent=formatNum(change,2)+'%'; 
+      row.cells[6].className=change>=0?'green':'red';
       
       ['1M','1w','1d'].forEach((int,idx)=>{
         const hist=rsiHistory[nm]&&rsiHistory[nm][int]; 
@@ -1044,7 +1025,7 @@ function updateProgress() {
     
     // A-RSI filtresi
     if(arsiFilterValue !== '0') {
-      const arsiValue = parseFloat(row.cells[8].textContent);
+      const arsiValue = parseFloat(row.cells[7].textContent);
       const [min, max] = arsiFilterValue.includes('+') ? 
         [parseInt(arsiFilterValue), 100] : 
         arsiFilterValue.split('-').map(Number);
@@ -1057,7 +1038,7 @@ function updateProgress() {
     
     // H-RSI filtresi
     if(hrsiFilterValue !== '0') {
-      const hrsiValue = parseFloat(row.cells[9].textContent);
+      const hrsiValue = parseFloat(row.cells[8].textContent);
       const [min, max] = hrsiFilterValue.includes('+') ? 
         [parseInt(hrsiFilterValue), 100] : 
         hrsiFilterValue.split('-').map(Number);
@@ -1070,7 +1051,7 @@ function updateProgress() {
     
     // G-RSI filtresi
     if(grsiFilterValue !== '0') {
-      const grsiValue = parseFloat(row.cells[10].textContent);
+      const grsiValue = parseFloat(row.cells[9].textContent);
       const [min, max] = grsiFilterValue.includes('+') ? 
         [parseInt(grsiFilterValue), 100] : 
         grsiFilterValue.split('-').map(Number);
@@ -1083,7 +1064,7 @@ function updateProgress() {
     
     // Dipten artış filtresi
     if(dipMultiplierValue > 0) {
-      const dipArtisCell = row.cells[6];
+      const dipArtisCell = row.cells[5];
       const dipArtisValue = parseFloat(dipArtisCell.textContent);
       let minPercentage = 0, maxPercentage = 0;
       
@@ -1133,7 +1114,7 @@ function updateProgress() {
       
       // A-RSI filtresi
       if(arsiFilterValue !== '0') {
-        const arsiValue = parseFloat(r.cells[8].textContent);
+        const arsiValue = parseFloat(r.cells[7].textContent);
         const [min, max] = arsiFilterValue.includes('+') ? 
           [parseInt(arsiFilterValue), 100] : 
           arsiFilterValue.split('-').map(Number);
@@ -1143,7 +1124,7 @@ function updateProgress() {
       
       // H-RSI filtresi
       if(hrsiFilterValue !== '0') {
-        const hrsiValue = parseFloat(r.cells[9].textContent);
+        const hrsiValue = parseFloat(r.cells[8].textContent);
         const [min, max] = hrsiFilterValue.includes('+') ? 
           [parseInt(hrsiFilterValue), 100] : 
           hrsiFilterValue.split('-').map(Number);
@@ -1153,7 +1134,7 @@ function updateProgress() {
       
       // G-RSI filtresi
       if(grsiFilterValue !== '0') {
-        const grsiValue = parseFloat(r.cells[10].textContent);
+        const grsiValue = parseFloat(r.cells[9].textContent);
         const [min, max] = grsiFilterValue.includes('+') ? 
           [parseInt(grsiFilterValue), 100] : 
           grsiFilterValue.split('-').map(Number);
@@ -1163,7 +1144,7 @@ function updateProgress() {
       
       // Dipten artış filtresi
       if(dipMultiplierValue > 0) {
-        const dipArtisCell = r.cells[6];
+        const dipArtisCell = r.cells[5];
         const dipArtisValue = parseFloat(dipArtisCell.textContent);
         let minPercentage = 0, maxPercentage = 0;
         
@@ -1187,7 +1168,7 @@ function updateProgress() {
   function sortTable(col){
     const rows=Array.from(tableBody.querySelectorAll('tr'));
     
-    if(col === 7 && autoSortCheckbox.checked){
+    if(col === 6 && autoSortCheckbox.checked){
       sortDirection[col] = false;
     }
     
@@ -1218,7 +1199,7 @@ function updateProgress() {
 
   autoSortCheckbox.addEventListener('change', function() {
     if(this.checked) {
-      autoSortInterval = setInterval(() => sortTable(7), 1000);
+      autoSortInterval = setInterval(() => sortTable(6), 1000);
     } else {
       clearInterval(autoSortInterval);
       autoSortInterval = null;
