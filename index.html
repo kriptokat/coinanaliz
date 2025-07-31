@@ -411,6 +411,30 @@
       top: 2px;
       z-index: 1;
     }
+
+    /* Yeni eklenen favori butonları için stil */
+    .favorite-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .favorite-button {
+      background: #00ffc3;
+      color: #0f2027;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Roboto Mono', monospace;
+      font-weight: bold;
+    }
+    
+    .favorite-button:hover {
+      background: #00e6b8;
+    }
     
     @media (max-width: 768px) { table { font-size: 12px; } }
   </style>
@@ -551,6 +575,13 @@
       <tbody></tbody>
     </table>
   </div>
+</div>
+
+<!-- Yeni eklenen favori butonları -->
+<div class="favorite-buttons">
+  <button class="favorite-button" onclick="downloadFavorites()">Favorileri İndir</button>
+  <button class="favorite-button" onclick="document.getElementById('favoriteFileInput').click()">Favorileri Yükle</button>
+  <input type="file" id="favoriteFileInput" accept=".json" style="display: none;" onchange="uploadFavorites(this)">
 </div>
 
 <!-- Portföy Modal -->
@@ -819,6 +850,48 @@
   let loadedCoins = 0;
   let favorites = JSON.parse(localStorage.getItem('favorites')) || {};
 
+  // Yeni eklenen favori fonksiyonları
+  function downloadFavorites() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(favorites));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "favorites.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  }
+
+  function uploadFavorites(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const newFavorites = JSON.parse(e.target.result);
+        if (typeof newFavorites === 'object' && newFavorites !== null) {
+          favorites = newFavorites;
+          localStorage.setItem('favorites', JSON.stringify(favorites));
+          
+          // Tüm favori checkbox'larını güncelle
+          document.querySelectorAll('.favorite-checkbox').forEach(checkbox => {
+            const coinName = checkbox.getAttribute('onchange').split("'")[1];
+            checkbox.checked = !!favorites[coinName];
+          });
+          
+          applyAllFilters();
+          alert('Favoriler başarıyla yüklendi!');
+        } else {
+          alert('Geçersiz dosya formatı!');
+        }
+      } catch (error) {
+        alert('Dosya okunurken hata oluştu: ' + error.message);
+      }
+    };
+    reader.readAsText(file);
+    input.value = ''; // Aynı dosyayı tekrar yükleyebilmek için input'u sıfırla
+  }
+
 function updateProgress() {
     const totalCoins = coinList.length;
     const percent = Math.round((loadedCoins / totalCoins) * 100);
@@ -837,7 +910,7 @@ function updateProgress() {
   }
 
   const coinList = [
-    "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
+        "1000CAT","1000CHEEMS","1000SATS","1INCH","1MBABYDOGE","AAVE","ACA","ACE","ACH","ACM","ACT","ACX","ADA",
     "ADX","AEVO","AGLD","AI","AIXBT","ALCX","ALGO","ALICE","ALPINE","ALT","AMP",
     "ANIME","ANKR","APE","API3","APT","AR","ARB","ARDR","ARK","ARKM","ARPA","ASR","ASTR","ATA","ATM","ATOM",
     "AUCTION","AUDIO","AVA","AVAX","AWE","AXL","AXS","BABY","BAKE","BANANA","BANANAS31","BAND","BAR","BAT","BB","BCH",
@@ -857,7 +930,7 @@ function updateProgress() {
     "RARE","RAY","RDNT","RED","REI","RENDER","RESOLV","REQ","REZ","RIF","RLC","RONIN","ROSE","RPL","RSR","RUNE","RVN","S","SAGA","SAHARA","SAND",
     "SANTOS","SC","SCR","SCRT","SEI","SFP","SHELL","SHIB","SIGN","SKL","SLF","SLP","SNX","SOL","SOLV","SOPH","SPELL","SPK","SSV","STEEM","STG",
     "STO","STORJ","STRAX","STRK","STX","SUI","SUN","SUPER","SUSHI","SXP","SYN","SXT","SYRUP","SYS","T","TAO","TFUEL","THE",
-    "THETA","TIA","TKO","TLM","TNSR","TON","TRB","TRU","TRUMP","TRX","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA",
+    "THETA","TIA","TKO","TLM","TNSR","TON","TRB","TREE","TRU","TRUMP","TRX","TST","TURBO","TUT","TWT","UMA","UNI","USUAL","UTK","VANA",
     "VANRY","VELODROME","VET","VIC","VIRTUAL","VOXEL","VTHO","W","WAN","WAXP","WCT","WIF","WIN","WLD",
     "WOO","XAI","XEC","XLM","XNO","XRP","XTZ","XVG","XVS","YFI","YGG","ZEC","ZEN","ZIL","ZK","ZRO","ZRX"
          ];
