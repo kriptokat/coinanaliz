@@ -6,168 +6,6 @@
   <title>Binance Coin Performans Tablosu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Yeni Header Stilleri */
-    .header-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 15px;
-  position: relative; /* Bu sayede içindeki absolute pozisyonlu elementler buna göre konumlanır */
-}
-    .title-row {
-      font-size: 16px;
-      color: #00ffc3;
-      text-shadow: 0 0 5px #00ffc3;
-      padding: 10px 15px;
-      margin: 0;
-      text-align: left;
-      border-bottom: 1px solid #00ffc355;
-      position: relative;
-    }
-    .title-row::after {
-      content: "";
-      position: absolute;
-      bottom: -1px;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #00ffc3, transparent);
-    }
-
-    /* Modern Yükleme Çubuğu Stilleri */
-    .loading-container {
-      position: sticky;
-      top: 10px;
-      width: 300px;
-      margin: 10px auto;
-      background: rgba(15, 25, 35, 0.95);
-      border-radius: 10px;
-      border: 1px solid #00ffc355;
-      z-index: 1000;
-      transition: opacity 0.5s;
-      box-shadow: 0 0 10px rgba(0, 255, 195, 0.3);
-    }
-    
-    .loading-bar {
-      width: 100%;
-      height: 4px;
-      background-color: #1c2c3c;
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-    }
-    
-    .progress {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #00ffc3, #00ffaa);
-      border-radius: 10px;
-      transition: width 0.3s ease;
-      position: relative;
-    }
-    
-    .progress::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.8) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: shimmer 1s infinite;
-
-    }
-    
-    .progress-text {
- display: none; /* Yazıyı tamamen gizledik */
-}
-    
-    @keyframes shimmer {
-      0% {
-        transform: translateX(-100%);
-      }
-      100% {
-        transform: translateX(100%);
-      }
-    }
-
-    /* LED Panel Stilleri */
-    .led-panel-container {
-      position: absolute;
-      left: 325px;
-      top: 4px;
-      z-index: 1;
-      background: transparent;
-      border: none;
-      padding: 0;
-      margin: 0;
-    }
-    
-    .led-panel {
-      display: flex;
-      background-color: transparent;
-      padding: 0;
-      gap: 8px;
-    }
-
-    .led-char {
-      display: grid;
-      grid-template-columns: repeat(5, 2px);
-      grid-template-rows: repeat(7, 2px);
-      gap: 2px;
-    }
-
-    .led-dot {
-      width: 2px;
-      height: 2px;
-      border-radius: 50%;
-      background-color: #111;
-      box-shadow: 0 0 1px #0ff;
-      transition: background-color 0.3s, box-shadow 0.3s;
-    }
-
-    .led-on {
-      background-color: #0ff;
-      box-shadow: 0 0 4px #0ff;
-    }
-
-    .led-on.up {
-      background-color: #0f0;
-      box-shadow: 0 0 4px #0f0;
-    }
-
-    .led-on.down {
-      background-color: #f00;
-      box-shadow: 0 0 4px #f00;
-    }
-
-    .led-slide-up {
-      animation: slideUp 0.4s ease;
-    }
-
-    .led-slide-down {
-      animation: slideDown 0.4s ease;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    @keyframes slideDown {
-      from { transform: translateY(-10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    .led-strip {
-      display: flex;
-      gap: 8px;
-    }
-
     /* Orijinal Stillerin Tamamı */
     .portfolio-modal {
       display: none;
@@ -398,20 +236,6 @@
       cursor: pointer;
     }
     
-    /* Sayaç için yeni stiller */
-    .counter-container {
-      background: rgba(15, 25, 35, 0.95);
-      border-radius: 5px;
-      box-shadow: 0 0 15px #00ffcc66, inset 0 0 10px rgba(0, 255, 195, 0.2);
-      border: 1px solid #00ffc3;
-      padding: 5px 10px;
-      display: inline-block;
-      position: absolute;
-      left: 750px;
-      top: 2px;
-      z-index: 1;
-    }
-
     /* Yeni eklenen favori butonları için stil */
     .favorite-buttons {
       display: flex;
@@ -440,33 +264,6 @@
   </style>
 </head>
 <body>
-
-<!-- Modern Yükleme Çubuğu -->
-<div class="loading-container" id="loadingContainer">
-  <div class="loading-bar">
-    <div class="progress" id="progressBar"></div>
-    <div class="progress-text" id="progressText">%0 Yüklendi</div>
-  </div>
-</div>
-
-<!-- Yeni Başlık Satırı -->
-<div class="header-container">
-  <div class="title-row">🚀 Binance Coin Performans Tablosu</div>
-  <!-- LED Panel -->
-  <div class="led-panel-container">
-    <div class="led-panel">
-      <div class="led-strip" id="ledLabel"></div>
-      <div class="led-strip" id="ledPrice"></div>
-    </div>
-  </div>
-  <!-- Sayaç Container -->
-  <div class="counter-container">
-    <div id="sfcjbq4sxejyjwcnf4jug2m4n1qcghq43wg"></div>
-    <script type="text/javascript" src="https://counter4.optistats.ovh/private/counter.js?c=jbq4sxejyjwcnf4jug2m4n1qcghq43wg&down=async" async></script>
-  </div>
-  <!-- Portföy Butonu -->
-  <button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
-</div>
 
 <!-- Tablo Container -->
 <div class="table-container">
@@ -604,131 +401,6 @@
 </div>
 
 <script>
-  // LED Panel Fonksiyonları
-  const ledAlphabet = {
-    'A': ["01110","10001","10001","11111","10001","10001","10001"],
-    'B': ["11110","10001","10001","11110","10001","10001","11110"],
-    'C': ["01110","10001","10000","10000","10000","10001","01110"],
-    'D': ["11110","10001","10001","10001","10001","10001","11110"],
-    'E': ["11111","10000","10000","11110","10000","10000","11111"],
-    'F': ["11111","10000","10000","11110","10000","10000","10000"],
-    'G': ["01110","10001","10000","10111","10001","10001","01111"],
-    'H': ["10001","10001","10001","11111","10001","10001","10001"],
-    'I': ["01110","00100","00100","00100","00100","00100","01110"],
-    'K': ["10001","10010","10100","11000","10100","10010","10001"],
-    'L': ["10000","10000","10000","10000","10000","10000","11111"],
-    'N': ["10001","11001","10101","10011","10001","10001","10001"],
-    'O': ["01110","10001","10001","10001","10001","10001","01110"],
-    'P': ["11110","10001","10001","11110","10000","10000","10000"],
-    'R': ["11110","10001","10001","11110","10100","10010","10001"],
-    'S': ["01111","10000","10000","01110","00001","00001","11110"],
-    'T': ["11111","00100","00100","00100","00100","00100","00100"],
-    'U': ["10001","10001","10001","10001","10001","10001","01110"],
-    'V': ["10001","10001","10001","10001","10001","01010","00100"],
-    'Y': ["10001","10001","01010","00100","00100","00100","00100"],
-    ':': ["00000","00100","00000","00000","00100","00000","00000"],
-    '.': ["00000","00000","00000","00000","00000","00100","00100"],
-    '0': ["01110","10001","10011","10101","11001","10001","01110"],
-    '1': ["00100","01100","00100","00100","00100","00100","01110"],
-    '2': ["01110","10001","00001","00010","00100","01000","11111"],
-    '3': ["11110","00001","00001","00110","00001","00001","11110"],
-    '4': ["00010","00110","01010","10010","11111","00010","00010"],
-    '5': ["11111","10000","11110","00001","00001","10001","01110"],
-    '6': ["01110","10000","11110","10001","10001","10001","01110"],
-    '7': ["11111","00001","00010","00100","01000","01000","01000"],
-    '8': ["01110","10001","10001","01110","10001","10001","01110"],
-    '9': ["01110","10001","10001","01111","00001","00001","01110"],
-    ' ': ["00000","00000","00000","00000","00000","00000","00000"]
-  };
-
-  const ledLabelEl = document.getElementById("ledLabel");
-  const ledPriceEl = document.getElementById("ledPrice");
-  let previousLedPrice = null;
-  let previousLedPriceText = "";
-
-  function renderLedText(container, text, prevText = '', direction = '') {
-    container.innerHTML = '';
-    const upperText = text.toUpperCase();
-
-    for (let i = 0; i < upperText.length; i++) {
-      const char = upperText[i];
-      const prevChar = prevText[i];
-      const matrix = ledAlphabet[char] || ledAlphabet[' '];
-      const prevMatrix = ledAlphabet[prevChar] || [];
-
-      const charDiv = document.createElement("div");
-      charDiv.className = "led-char";
-
-      matrix.forEach((row, rowIndex) => {
-        [...row].forEach((dot, colIndex) => {
-          const dotDiv = document.createElement("div");
-          const isOn = dot === '1';
-          const wasOn = prevMatrix[rowIndex] && prevMatrix[rowIndex][colIndex] === '1';
-          dotDiv.className = "led-dot";
-          if (isOn) {
-            dotDiv.classList.add("led-on");
-            if (!wasOn && direction) {
-              dotDiv.classList.add(direction === "up" ? "led-slide-up" : "led-slide-down");
-            }
-            if (direction) dotDiv.classList.add(direction);
-          }
-          charDiv.appendChild(dotDiv);
-        });
-      });
-
-      container.appendChild(charDiv);
-    }
-  }
-
-  async function scrambleLedText(text, container) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:';
-    let result = Array(text.length).fill('');
-    const delay = ms => new Promise(r => setTimeout(r, ms));
-
-    for (let i = 0; i < text.length; i++) {
-      for (let t = 0; t < 4; t++) {
-        result[i] = chars[Math.floor(Math.random() * chars.length)];
-        renderLedText(container, result.join(''));
-        await delay(40);
-      }
-      result[i] = text[i];
-      renderLedText(container, result.join(''));
-      await delay(80);
-    }
-  }
-
-  async function ledMainLoop() {
-    await scrambleLedText("BITCOIN:", ledLabelEl);
-
-    while (true) {
-      let text = "";
-      let direction = "up";
-
-      try {
-        const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT");
-        const data = await res.json();
-        const price = Math.floor(parseFloat(data.price));
-        text = price.toString();
-
-        if (previousLedPrice !== null) {
-          direction = price > previousLedPrice ? "up" : price < previousLedPrice ? "down" : '';
-        }
-
-        previousLedPrice = price;
-      } catch {
-        text = "ERR";
-      }
-
-      renderLedText(ledPriceEl, text, previousLedPriceText, direction);
-      previousLedPriceText = text;
-
-      await new Promise(r => setTimeout(r, 1000));
-    }
-  }
-
-  // LED paneli başlat
-  ledMainLoop();
-
   // Portföy Fonksiyonları
   let portfolio = JSON.parse(localStorage.getItem('portfolio')) || {};
   let exchangeRates = { USD: 1, TRY: 1, EUR: 1, GBP: 1, JPY: 1, CNY: 1 };
@@ -844,9 +516,6 @@
 
   // Orijinal Scriptler
   let autoSortInterval = null;
-  const progressBar = document.getElementById('progressBar');
-  const progressText = document.getElementById('progressText');
-  const loadingContainer = document.getElementById('loadingContainer');
   let loadedCoins = 0;
   let favorites = JSON.parse(localStorage.getItem('favorites')) || {};
 
@@ -895,14 +564,6 @@
 function updateProgress() {
     const totalCoins = coinList.length;
     const percent = Math.round((loadedCoins / totalCoins) * 100);
-    progressBar.style.width = `${percent}%`;
-    
-    if(percent === 100) {
-      setTimeout(() => {
-        loadingContainer.style.opacity = '0';
-        setTimeout(() => loadingContainer.style.display = 'none', 500);
-      }, 1000);
-    }
 }
 
   function formatNum(val, decimals) {
@@ -947,9 +608,6 @@ loadCoinList();
 
   function updateTable() {
     loadedCoins = 0;
-    loadingContainer.style.display = 'block';
-    loadingContainer.style.opacity = '1';
-    updateProgress();
     updateExchangeRates();
 
     const months = parseInt(document.getElementById('dipMonths').value)||1;
@@ -1147,73 +805,79 @@ loadCoinList();
       }
       
       const isValid = dipArtisValue > minPercentage && dipArtisValue <= maxPercentage;
-      if(!isValid) row.style.display = 'none';
+      if(!isValid) {
+        row.style.display = 'none';
+        return;
+      }
     }
-  }
-
-  function filterByRSI(type, value) {
-    applyAllFilters();
+    
+    row.style.display = '';
   }
 
   function applyAllFilters() {
-    const favoriteFilterEnabled = document.getElementById('favoriteFilter').checked;
     const searchTerm = document.getElementById('coinSearch').value.toLowerCase();
+    const favoriteFilterEnabled = document.getElementById('favoriteFilter').checked;
     const arsiFilterValue = document.getElementById('arsiFilter').value;
     const hrsiFilterValue = document.getElementById('hrsiFilter').value;
     const grsiFilterValue = document.getElementById('grsiFilter').value;
     const dipMultiplierValue = parseInt(document.getElementById('dipMultiplier').value);
     
-    tableBody.querySelectorAll('tr').forEach(r => {
-      const coinName = r.cells[2].querySelector('a').textContent;
+    tableBody.querySelectorAll('tr').forEach(row => {
+      const coinName = row.cells[2].querySelector('a').textContent.toLowerCase();
+      const matchesSearch = coinName.includes(searchTerm);
       
-      // Önce favori filtresini uygula
+      if(!matchesSearch) {
+        row.style.display = 'none';
+        return;
+      }
+      
       if(favoriteFilterEnabled && !favorites[coinName]) {
-        r.style.display = 'none';
+        row.style.display = 'none';
         return;
       }
-      
-      // Arama filtresini uygula
-      if(searchTerm && !coinName.toLowerCase().includes(searchTerm)) {
-        r.style.display = 'none';
-        return;
-      }
-      
-      // Diğer filtreleri uygula
-      let shouldShow = true;
       
       // A-RSI filtresi
       if(arsiFilterValue !== '0') {
-        const arsiValue = parseFloat(r.cells[7].textContent);
+        const arsiValue = parseFloat(row.cells[7].textContent);
         const [min, max] = arsiFilterValue.includes('+') ? 
           [parseInt(arsiFilterValue), 100] : 
           arsiFilterValue.split('-').map(Number);
         
-        if(arsiValue < min || (max && arsiValue > max)) shouldShow = false;
+        if(arsiValue < min || (max && arsiValue > max)) {
+          row.style.display = 'none';
+          return;
+        }
       }
       
       // H-RSI filtresi
       if(hrsiFilterValue !== '0') {
-        const hrsiValue = parseFloat(r.cells[8].textContent);
+        const hrsiValue = parseFloat(row.cells[8].textContent);
         const [min, max] = hrsiFilterValue.includes('+') ? 
           [parseInt(hrsiFilterValue), 100] : 
           hrsiFilterValue.split('-').map(Number);
         
-        if(hrsiValue < min || (max && hrsiValue > max)) shouldShow = false;
+        if(hrsiValue < min || (max && hrsiValue > max)) {
+          row.style.display = 'none';
+          return;
+        }
       }
       
       // G-RSI filtresi
       if(grsiFilterValue !== '0') {
-        const grsiValue = parseFloat(r.cells[9].textContent);
+        const grsiValue = parseFloat(row.cells[9].textContent);
         const [min, max] = grsiFilterValue.includes('+') ? 
           [parseInt(grsiFilterValue), 100] : 
           grsiFilterValue.split('-').map(Number);
         
-        if(grsiValue < min || (max && grsiValue > max)) shouldShow = false;
+        if(grsiValue < min || (max && grsiValue > max)) {
+          row.style.display = 'none';
+          return;
+        }
       }
       
       // Dipten artış filtresi
       if(dipMultiplierValue > 0) {
-        const dipArtisCell = r.cells[5];
+        const dipArtisCell = row.cells[5];
         const dipArtisValue = parseFloat(dipArtisCell.textContent);
         let minPercentage = 0, maxPercentage = 0;
         
@@ -1227,56 +891,59 @@ loadCoinList();
         }
         
         const isValid = dipArtisValue > minPercentage && dipArtisValue <= maxPercentage;
-        if(!isValid) shouldShow = false;
+        if(!isValid) {
+          row.style.display = 'none';
+          return;
+        }
       }
       
-      r.style.display = shouldShow ? '' : 'none';
+      row.style.display = '';
     });
   }
 
-  function sortTable(col){
-    const rows=Array.from(tableBody.querySelectorAll('tr'));
-    
-    if(col === 6 && autoSortCheckbox.checked){
-      sortDirection[col] = false;
-    }
-    
-    const dir=sortDirection[col]?1:-1;
-    rows.sort((a,b)=>{
-      let x=a.cells[col].textContent.trim();
-      let y=b.cells[col].textContent.trim();
-      
-      if(col === 2) {
-        return x.localeCompare(y, 'en', {numeric: true}) * dir;
-      }
-      
-      if(col >= 3) {
-        x=parseFloat(x)||0;
-        y=parseFloat(y)||0;
-        return x>y?dir:x<y?-dir:0;
-      }
-      
-      return 0;
-    });
-    
-    rows.forEach((r,i)=>{
-      r.cells[1].textContent=i+1;
-      tableBody.appendChild(r);
-    });
-    sortDirection[col]=!sortDirection[col];
+  function filterByRSI(type, value) {
+    applyAllFilters();
   }
 
-  autoSortCheckbox.addEventListener('change', function() {
-    if(this.checked) {
-      autoSortInterval = setInterval(() => sortTable(6), 1000);
+  function sortTable(colIndex) {
+    if(colIndex === 0) return; // Favori sütunu sıralanmaz
+    
+    const rows = Array.from(tableBody.querySelectorAll('tr'));
+    const isNumeric = colIndex !== 2; // Coin adı hariç tüm sütunlar sayısal
+    
+    rows.sort((a, b) => {
+      let aVal = a.cells[colIndex].textContent.replace(/[^\d.-]/g, '');
+      let bVal = b.cells[colIndex].textContent.replace(/[^\d.-]/g, '');
+      
+      if(isNumeric) {
+        aVal = parseFloat(aVal) || 0;
+        bVal = parseFloat(bVal) || 0;
+        return sortDirection[colIndex] ? aVal - bVal : bVal - aVal;
+      } else {
+        return sortDirection[colIndex] ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      }
+    });
+    
+    rows.forEach(row => tableBody.appendChild(row));
+    sortDirection[colIndex] = !sortDirection[colIndex];
+  }
+
+  // Otomatik sıralama kontrolü
+  document.getElementById('autoSortCheckbox').addEventListener('change', function(e) {
+    if (e.target.checked) {
+      autoSortInterval = setInterval(() => {
+        sortTable(6); // 24s değişim sütunu için sırala
+      }, 5000);
     } else {
       clearInterval(autoSortInterval);
       autoSortInterval = null;
     }
   });
 
-  updateTable();
+  // Sayfa yüklendiğinde döviz kurlarını güncelle
+  window.onload = function() {
+    updateExchangeRates();
+  };
 </script>
-
 </body>
 </html>
