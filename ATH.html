@@ -1,0 +1,169 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Binance Gerçek ATH Hesaplayıcı (Hızlı + Excel + Sıralama)</title>
+<style>
+  body { background:#0f172a; color:#e2e8f0; font-family:'Segoe UI',sans-serif; text-align:center; }
+  table { width:100%; border-collapse:collapse; margin-top:20px; }
+  th,td { border:1px solid rgba(255,255,255,0.1); padding:8px; font-size:13px; }
+  th { background:#1e3a8a; color:#fff; cursor:pointer; user-select:none; }
+  tr:hover td { background:#1e293b; }
+  td.green{color:#34d399;font-weight:bold;}
+  td.red{color:#f87171;font-weight:bold;}
+  td.coin-name a{ color:#facc15; font-weight:900; text-shadow:0 0 6px rgba(250,204,21,0.6); text-decoration:none; }
+  td.coin-name a:hover{color:#fde68a;text-shadow:0 0 10px rgba(250,204,21,0.9);}
+  #progress {margin-top:15px;}
+  .bar{width:80%;height:8px;background:#1e293b;border-radius:4px;margin:10px auto;overflow:hidden;}
+  .fill{height:100%;background:linear-gradient(90deg,#34d399,#60a5fa,#a78bfa);width:0%;transition:width 0.3s;}
+  #downloadBtn {
+    background:#2563eb; color:#fff; border:none; padding:8px 16px; border-radius:6px;
+    font-weight:bold; cursor:pointer; margin-top:15px; display:none;
+  }
+  #downloadBtn:hover { background:#1e40af; }
+</style>
+</head>
+<body>
+<h2>Binance Spot — Gerçek All Time High (ATH) Hesaplayıcı + Güncel Fiyat</h2>
+<p id="progress">Hazırlanıyor...</p>
+<div class="bar"><div class="fill" id="fill"></div></div>
+<button id="downloadBtn">📊 Excel Olarak İndir</button>
+
+<table id="athTable">
+  <thead>
+    <tr>
+      <th>Coin</th>
+      <th>Güncel Fiyat (USDT)</th>
+      <th>Gerçek Binance ATH</th>
+      <th>ATH / Fiyat Oranı</th>
+      <th>Toplam Gün</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function formatNumber(num, maxDecimals = 8) {
+  if (!isFinite(num)) return '-';
+  const trimmed = parseFloat(num.toFixed(maxDecimals));
+  return trimmed.toString();
+}
+
+async function getKlinesATH(symbol){
+  let startTime = 1500000000000; // 2017
+  let allHighs = [];
+  while(startTime < Date.now()){
+    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1d&limit=1000&startTime=${startTime}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!Array.isArray(data) || data.length === 0) break;
+    allHighs.push(...data.map(k => +k[2]));
+    startTime = data[data.length-1][0] + 1;
+    await sleep(50);
+  }
+  return {ath: Math.max(...allHighs), total: allHighs.length};
+}
+
+async function getAllCoinsATH(){
+  const progress = document.getElementById("progress");
+  const fill = document.getElementById("fill");
+  const tbody = document.querySelector("#athTable tbody");
+  const downloadBtn = document.getElementById("downloadBtn");
+
+  const res = await fetch("https://api.binance.com/api/v3/exchangeInfo");
+  const data = await res.json();
+  const coins = data.symbols
+    .filter(s => s.symbol.endsWith("USDT") && s.status === "TRADING")
+    .map(s => s.baseAsset);
+
+  progress.textContent = `${coins.length} coin bulundu, hesaplama başlıyor...`;
+
+  const tickerData = await fetch("https://api.binance.com/api/v3/ticker/price").then(r=>r.json());
+  const priceMap = new Map(tickerData.map(d=>[d.symbol, parseFloat(d.price)]));
+
+  const batchSize = 10; // paralel sorgu sayısı
+  const allRows = [];
+
+  for (let i = 0; i < coins.length; i += batchSize) {
+    const batch = coins.slice(i, i + batchSize);
+    const results = await Promise.all(batch.map(async coin => {
+      const symbol = coin + "USDT";
+      try {
+        const {ath,total} = await getKlinesATH(symbol);
+        const currentPrice = priceMap.get(symbol) || 0;
+        const ratio = (ath && currentPrice) ? (ath / currentPrice) : 0;
+        const ratioColor = ratio > 1.2 ? "green" : ratio < 1 ? "red" : "";
+        return {coin, link:`https://www.binance.com/en/trade/${symbol}`, price:currentPrice, ath, ratio, total, ratioColor};
+      } catch (err) {
+        console.log("Hata:", coin, err);
+        return null;
+      }
+    }));
+
+    results.filter(Boolean).forEach(row => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="coin-name"><a href="${row.link}" target="_blank">${row.coin}</a></td>
+        <td>${formatNumber(row.price)}</td>
+        <td class="green">${formatNumber(row.ath)}</td>
+        <td class="${row.ratioColor}">${formatNumber(row.ratio, 2)}</td>
+        <td>${row.total}</td>`;
+      tbody.appendChild(tr);
+      allRows.push(row);
+    });
+
+    const pct = Math.min(100, Math.round((i + batch.length) / coins.length * 100));
+    fill.style.width = pct + "%";
+    progress.textContent = `${Math.min(i + batch.length, coins.length)}/${coins.length} coin işlendi (${pct}%)`;
+    await sleep(300);
+  }
+
+  progress.textContent = "✅ Tüm coinlerin gerçek ATH ve fiyat verileri hesaplandı!";
+  downloadBtn.style.display = "inline-block";
+
+  // Excel indir
+  downloadBtn.onclick = () => {
+    const wsData = [
+      ["Coin", "Güncel Fiyat", "Gerçek ATH", "ATH/Fiyat", "Toplam Gün"],
+      ...allRows.map(r => [r.coin, r.price, r.ath, r.ratio, r.total])
+    ];
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "ATH Verileri");
+    XLSX.writeFile(wb, "Binance_ATH_Verileri.xlsx");
+  };
+
+  enableSorting();
+}
+
+// --- Sıralama Özelliği ---
+function enableSorting() {
+  const table = document.getElementById("athTable");
+  const headers = table.querySelectorAll("th");
+  headers.forEach((header, idx) => {
+    let asc = true;
+    header.addEventListener("click", () => {
+      const tbody = table.querySelector("tbody");
+      const rows = Array.from(tbody.querySelectorAll("tr"));
+      rows.sort((a,b)=>{
+        const valA = a.children[idx].innerText.trim();
+        const valB = b.children[idx].innerText.trim();
+        const numA = parseFloat(valA.replace(',','.'));
+        const numB = parseFloat(valB.replace(',','.'));
+        if(!isNaN(numA) && !isNaN(numB))
+          return asc ? numA - numB : numB - numA;
+        return asc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      });
+      asc = !asc;
+      rows.forEach(r=>tbody.appendChild(r));
+    });
+  });
+}
+
+getAllCoinsATH();
+</script>
+</body>
+</html>
