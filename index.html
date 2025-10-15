@@ -398,20 +398,6 @@
       cursor: pointer;
     }
     
-    /* Sayaç için yeni stiller */
-    .counter-container {
-      background: rgba(15, 25, 35, 0.95);
-      border-radius: 5px;
-      box-shadow: 0 0 15px #00ffcc66, inset 0 0 10px rgba(0, 255, 195, 0.2);
-      border: 1px solid #00ffc3;
-      padding: 5px 10px;
-      display: inline-block;
-      position: absolute;
-      left: 750px;
-      top: 2px;
-      z-index: 1;
-    }
-
     /* Yeni eklenen favori butonları için stil */
     .favorite-buttons {
       display: flex;
@@ -459,11 +445,10 @@
       <div class="led-strip" id="ledPrice"></div>
     </div>
   </div>
-  <!-- Sayaç Container -->
-  <div class="counter-container">
-    <div id="sfcjbq4sxejyjwcnf4jug2m4n1qcghq43wg"></div>
-    <script type="text/javascript" src="https://counter4.optistats.ovh/private/counter.js?c=jbq4sxejyjwcnf4jug2m4n1qcghq43wg&down=async" async></script>
-  </div>
+<!-- 4S-S RSI Butonu - ATH butonunun soluna eklendi -->
+  <button class="portfolio-button" style="right: 157px;" onclick="window.open('https://kriptokat.github.io/coinanaliz-light/', '_blank')">4S-S RSI</button>
+<!-- ATH Butonu - Portföy butonunun soluna eklendi -->
+  <button class="portfolio-button" style="right: 103px;" onclick="window.open('https://kriptokat.github.io/coinanaliz/ATH.html', '_blank')">ATH</button>
   <!-- Portföy Butonu -->
   <button class="portfolio-button" onclick="togglePortfolio()">Portföy</button>
 </div>
@@ -582,8 +567,6 @@
   <button class="favorite-button" onclick="downloadFavorites()">Favorileri İndir</button>
   <button class="favorite-button" onclick="document.getElementById('favoriteFileInput').click()">Favorileri Yükle</button>
   <input type="file" id="favoriteFileInput" accept=".json" style="display: none;" onchange="uploadFavorites(this)">
-<button class="favorite-button" onclick="window.open('https://kriptokat.github.io/coinanaliz-light/', '_blank')">4S-S RSI</button>
-<button class="favorite-button" onclick="window.open('https://kriptokat.github.io/coinanaliz/ATH.html', '_blank')">ATH</button>
 </div>
 
 <!-- Portföy Modal -->
