@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
@@ -10,6 +10,7 @@
   th { background:#1e3a8a; color:#fff; cursor:pointer; user-select:none; }
   tr:hover td { background:#1e293b; }
   td.green{color:#34d399;font-weight:bold;}
+  td.yellow{color:#facc15;font-weight:bold;}
   td.red{color:#f87171;font-weight:bold;}
   td.coin-name a{ color:#facc15; font-weight:900; text-shadow:0 0 6px rgba(250,204,21,0.6); text-decoration:none; }
   td.coin-name a:hover{color:#fde68a;text-shadow:0 0 10px rgba(250,204,21,0.9);}
@@ -35,7 +36,7 @@
       <th>Coin</th>
       <th>Güncel Fiyat (USDT)</th>
       <th>Gerçek Binance ATH</th>
-      <th>ATH / Fiyat Oranı</th>
+      <th>Fiyat / ATH Oranı</th>
       <th>Toplam Gün</th>
     </tr>
   </thead>
@@ -94,8 +95,11 @@ async function getAllCoinsATH(){
       try {
         const {ath,total} = await getKlinesATH(symbol);
         const currentPrice = priceMap.get(symbol) || 0;
-        const ratio = (ath && currentPrice) ? (ath / currentPrice) : 0;
-        const ratioColor = ratio > 1.2 ? "green" : ratio < 1 ? "red" : "";
+        const ratio = (ath && currentPrice) ? (currentPrice / ath) : 0;
+        let ratioColor = "";
+        if (ratio > 0.8) ratioColor = "green";
+        else if (ratio > 0.5) ratioColor = "yellow";
+        else ratioColor = "red";
         return {coin, link:`https://www.binance.com/en/trade/${symbol}`, price:currentPrice, ath, ratio, total, ratioColor};
       } catch (err) {
         console.log("Hata:", coin, err);
@@ -127,7 +131,7 @@ async function getAllCoinsATH(){
   // Excel indir
   downloadBtn.onclick = () => {
     const wsData = [
-      ["Coin", "Güncel Fiyat", "Gerçek ATH", "ATH/Fiyat", "Toplam Gün"],
+      ["Coin", "Güncel Fiyat", "Gerçek ATH", "Fiyat/ATH", "Toplam Gün"],
       ...allRows.map(r => [r.coin, r.price, r.ath, r.ratio, r.total])
     ];
     const wb = XLSX.utils.book_new();
