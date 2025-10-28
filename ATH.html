@@ -37,6 +37,7 @@
       <th>Güncel Fiyat (USDT)</th>
       <th>Gerçek Binance ATH</th>
       <th>Fiyat / ATH Oranı</th>
+      <th>ATH / Fiyat</th>
       <th>Toplam Gün</th>
     </tr>
   </thead>
@@ -96,11 +97,12 @@ async function getAllCoinsATH(){
         const {ath,total} = await getKlinesATH(symbol);
         const currentPrice = priceMap.get(symbol) || 0;
         const ratio = (ath && currentPrice) ? (currentPrice / ath) : 0;
+        const athPriceRatio = (ath && currentPrice) ? (ath / currentPrice) : 0;
         let ratioColor = "";
         if (ratio > 0.8) ratioColor = "green";
         else if (ratio > 0.5) ratioColor = "yellow";
         else ratioColor = "red";
-        return {coin, link:`https://www.binance.com/en/trade/${symbol}`, price:currentPrice, ath, ratio, total, ratioColor};
+        return {coin, link:`https://www.binance.com/en/trade/${symbol}`, price:currentPrice, ath, ratio, athPriceRatio, total, ratioColor};
       } catch (err) {
         console.log("Hata:", coin, err);
         return null;
@@ -113,7 +115,8 @@ async function getAllCoinsATH(){
         <td class="coin-name"><a href="${row.link}" target="_blank">${row.coin}</a></td>
         <td>${formatNumber(row.price)}</td>
         <td class="green">${formatNumber(row.ath)}</td>
-        <td class="${row.ratioColor}">${formatNumber(row.ratio, 2)}</td>
+        <td class="${row.ratioColor}">${formatNumber(row.ratio, 3)}</td>
+        <td>${formatNumber(row.athPriceRatio, 3)}</td>
         <td>${row.total}</td>`;
       tbody.appendChild(tr);
       allRows.push(row);
@@ -131,8 +134,8 @@ async function getAllCoinsATH(){
   // Excel indir
   downloadBtn.onclick = () => {
     const wsData = [
-      ["Coin", "Güncel Fiyat", "Gerçek ATH", "Fiyat/ATH", "Toplam Gün"],
-      ...allRows.map(r => [r.coin, r.price, r.ath, r.ratio, r.total])
+      ["Coin", "Güncel Fiyat", "Gerçek ATH", "Fiyat/ATH", "ATH/Fiyat", "Toplam Gün"],
+      ...allRows.map(r => [r.coin, r.price, r.ath, r.ratio, r.athPriceRatio, r.total])
     ];
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(wsData);
