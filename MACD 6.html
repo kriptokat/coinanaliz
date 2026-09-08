@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="https://img.icons8.com/?size=100&id=E7kXDlAgCj90&format=png&color=000000">
+  <title>BİNANCE GÜNLÜK MACD DEĞERLERİ</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #e0e0e0;
+      padding: 10px;
+      text-align: center;
+      overflow-x: hidden;
+    }
+
+    .header-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 0 15px;
+      position: relative;
+    }
+
+    .title-row {
+      font-size: 16px;
+      color: #00ffc3;
+      text-shadow: 0 0 5px #00ffc3;
+      padding: 10px 15px;
+      margin: 0;
+      text-align: left;
+      border-bottom: 1px solid #00ffc355;
+      position: relative;
+    }
+
+    .title-row::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #00ffc3, transparent);
+    }
+
+    .status {
+      max-width: 500px;
+      margin: 6px auto 0;
+      padding: 4px 8px;
+      font-size: 10px;
+      color: #9eeedd;
+      opacity: .9;
+      text-align: left;
+    }
+
+    .table-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 6px;
+    }
+
+    .table-wrapper {
+      background: rgba(15, 25, 35, 0.95);
+      border-radius: 10px;
+      box-shadow: 0 0 15px #00ffcc66, inset 0 0 10px rgba(0, 255, 195, 0.2);
+      max-width: 500px;
+      width: 100%;
+      overflow-x: auto;
+      max-height: 500px;
+      border: 1px solid #00ffc3;
+      position: relative;
+    }
+
+    .table-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(0, 255, 195, 0.05) 0%,
+        rgba(0, 255, 195, 0) 20%,
+        rgba(0, 255, 195, 0) 80%,
+        rgba(0, 255, 195, 0.05) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      table-layout: fixed;
+      font-size: 13px;
+      position: relative;
+      z-index: 2;
+    }
+
+    thead th:nth-child(1),
+    tbody td:nth-child(1) { width: 44px; }
+
+    thead th:nth-child(2),
+    tbody td:nth-child(2) { width: 34px; }
+
+    thead th:nth-child(3),
+    tbody td:nth-child(3) {
+      width: 150px;
+    }
+
+    thead th:nth-child(4),
+    tbody td:nth-child(4) {
+      width: 120px;
+    }
+
+    thead th {
+      background: #00ffc3;
+      color: #0f2027;
+      font-size: 14px;
+      font-weight: bold;
+      font-family: "Roboto Mono", monospace;
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      padding: 8px 2px;
+      border-right: 1px solid #088f8f;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    thead th:first-child,
+    thead th:nth-child(2) {
+      cursor: default;
+    }
+
+    thead th:last-child {
+      border-right: none;
+    }
+
+    tbody td {
+      padding: 8px 2px;
+      text-align: center;
+      border: 1px solid #00ffc322;
+      font-size: 13px;
+      transition: color .1s ease, background-color .1s ease;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover {
+      background: rgba(0,255,195,.05);
+    }
+
+    td.green {
+      color: #00ff00;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+    }
+
+    td.red {
+      color: #ff4d4d;
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(255, 77, 77, 0.3);
+    }
+
+    td.neutral {
+      color: #d8d8d8;
+      font-weight: bold;
+    }
+
+    td.coin-name {
+      font-weight: bold;
+      text-align: left;
+      padding-left: 7px;
+      color: #fff;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    td.coin-name a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    td.coin-name a:hover {
+      text-decoration: underline;
+      color: #00ffc3;
+    }
+
+    .chart-emoji {
+      float: right;
+      margin-left: 3px;
+      text-decoration: none !important;
+      font-size: 11px;
+    }
+
+    .chart-emoji:hover {
+      color: #00ffc3 !important;
+      text-decoration: none !important;
+    }
+
+    .search-input {
+      margin-top: 2px;
+      padding: 2px 3px;
+      font-size: 10px;
+      width: 58px;
+      border: 1px solid #00ffc3;
+      border-radius: 3px;
+      background: #1c2c3c;
+      color: #e0e0e0;
+      outline: none;
+    }
+
+    .search-input:focus {
+      box-shadow: 0 0 6px #00ffc355;
+    }
+
+    .favorite-checkbox {
+      transform: scale(.7);
+      cursor: pointer;
+    }
+
+    .macd {
+      font-variant-numeric: tabular-nums;
+    }
+
+    @media (max-width: 520px) {
+      .table-wrapper { max-width: 100%; }
+      table { font-size: 13px; }
+      thead th { font-size: 14px; padding: 8px 2px; }
+      tbody td { padding: 8px 2px; }
+
+      thead th:nth-child(3),
+      tbody td:nth-child(3) { width: 125px; }
+
+      thead th:nth-child(4),
+      tbody td:nth-child(4) { width: 105px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header-container">
+    <div class="title-row">🚀 BİNANCE GÜNLÜK MACD DEĞERLERİ</div>
+  </div>
+
+  <div class="status" id="status">Başlatılıyor...</div>
+
+  <div class="table-container">
+    <div class="table-wrapper">
+      <table id="coinTable">
+        <thead>
+          <tr>
+            <th>
+              ★<br>
+              <input
+                type="checkbox"
+                id="favoriteFilter"
+                onclick="event.stopPropagation()"
+                onchange="applyAllFilters()"
+                style="transform:scale(.7);"
+                title="Sadece favoriler"
+              >
+            </th>
+
+            <th>#</th>
+
+            <th onclick="sortTable(2)">
+              Coin<br>
+              <input
+                id="coinSearch"
+                type="text"
+                class="search-input"
+                placeholder="Ara..."
+                oninput="searchCoin()"
+                onclick="event.stopPropagation()"
+              >
+            </th>
+
+            <th onclick="sortTable(3)">
+              MACD H
+            </th>
+          </tr>
+        </thead>
+
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+"use strict";
+
+/*
+  ============================================================
+  BİNANCE GÜNLÜK MACD
+  ------------------------------------------------------------
+  Gösterilen değer:
+      MACD Histogram = MACD Line - Signal Line
+
+  MACD Line:
+      EMA(12) - EMA(26)
+
+  Signal:
+      EMA(9) of MACD Line
+
+  Bu sürümde:
+  - Kapanmış günlük mumlar REST API'den alınır.
+  - Açık olan gün, Binance 1d kline WebSocket'teki
+    gerçek güncel close değeriyle ayrıca hesaplanır.
+  - Kapanmış mumların hiçbiri canlı fiyatla değiştirilmez.
+  - 500 günlük geçmiş kullanılır; bu EMA başlangıcını
+    100 günlük sürüme göre daha kararlı hale getirir.
+  - Aynı WebSocket tek bağlantı üzerinden tüm coinleri izler.
+  ============================================================
+*/
+
+const API_BASE = "https://api.binance.com";
+const WS_BASE = "wss://stream.binance.com:9443/stream";
+
+const HISTORY_LIMIT = 500;
+const REST_CONCURRENCY = 6;
+
+let favorites = JSON.parse(localStorage.getItem("favorites") || "{}");
+let coinList = [];
+let tableRows = new Map();
+let macdHistory = {};
+let livePrices = {};
+let socket = null;
+let reconnectTimer = null;
+let currentSort = { col: -1, asc: true };
+
+const tableBody = document.querySelector("#coinTable tbody");
+const statusEl = document.getElementById("status");
+
+/* ------------------------------------------------------------
+   Yardımcılar
+------------------------------------------------------------ */
+
+function setStatus(text) {
+  statusEl.textContent = text;
+}
+
+function formatNum(value, decimals = 10) {
+  if (!Number.isFinite(value)) return "0";
+
+  let out = Number(value).toFixed(decimals);
+
+  out = out.replace(/(\.\d*?[1-9])0+$/, "$1");
+  out = out.replace(/\.0+$/, "");
+  out = out.replace(/\.$/, "");
+
+  return out === "-0" ? "0" : out;
+}
+
+/* ------------------------------------------------------------
+   EMA
+------------------------------------------------------------ */
+
+function calculateEMA(values, period) {
+  const result = new Array(values.length).fill(null);
+
+  if (!Array.isArray(values) || values.length < period) {
+    return result;
+  }
+
+  let sum = 0;
+
+  for (let i = 0; i < period; i++) {
+    sum += values[i];
+  }
+
+  let ema = sum / period;
+  result[period - 1] = ema;
+
+  const multiplier = 2 / (period + 1);
+
+  for (let i = period; i < values.length; i++) {
+    ema =
+      (values[i] * multiplier) +
+      (ema * (1 - multiplier));
+
+    result[i] = ema;
+  }
+
+  return result;
+}
+
+/* ------------------------------------------------------------
+   MACD
+------------------------------------------------------------ */
+
+function computeMACD(closes) {
+  if (!Array.isArray(closes) || closes.length < 35) {
+    return {
+      macd: NaN,
+      signal: NaN,
+      histogram: NaN
+    };
+  }
+
+  const ema12 = calculateEMA(closes, 12);
+  const ema26 = calculateEMA(closes, 26);
+
+  const macdValues = [];
+
+  for (let i = 0; i < closes.length; i++) {
+    if (
+      ema12[i] !== null &&
+      ema26[i] !== null
+    ) {
+      macdValues.push(
+        ema12[i] - ema26[i]
+      );
+    }
+  }
+
+  if (macdValues.length < 9) {
+    return {
+      macd: NaN,
+      signal: NaN,
+      histogram: NaN
+    };
+  }
+
+  const signalValues =
+    calculateEMA(macdValues, 9);
+
+  const macd =
+    macdValues[macdValues.length - 1];
+
+  const signal =
+    signalValues[signalValues.length - 1];
+
+  if (!Number.isFinite(macd) ||
+      !Number.isFinite(signal)) {
+    return {
+      macd: NaN,
+      signal: NaN,
+      histogram: NaN
+    };
+  }
+
+  return {
+    macd,
+    signal,
+    histogram: macd - signal
+  };
+}
+
+/* ------------------------------------------------------------
+   Hücre güncelle
+------------------------------------------------------------ */
+
+function updateMACDCell(cell, histogram) {
+  cell.classList.remove(
+    "green",
+    "red",
+    "neutral"
+  );
+
+  if (!Number.isFinite(histogram)) {
+    cell.textContent = "0";
+    cell.classList.add("neutral");
+    return;
+  }
+
+  cell.textContent =
+    formatNum(histogram, 10);
+
+  if (histogram > 0) {
+    cell.classList.add("green");
+  } else if (histogram < 0) {
+    cell.classList.add("red");
+  } else {
+    cell.classList.add("neutral");
+  }
+}
+
+/* ------------------------------------------------------------
+   Kapanmış mumları al
+------------------------------------------------------------ */
+
+async function loadMACDHistory(symbol) {
+  const url =
+    `${API_BASE}/api/v3/klines` +
+    `?symbol=${encodeURIComponent(symbol)}USDT` +
+    `&interval=1d` +
+    `&limit=${HISTORY_LIMIT}`;
+
+  const res = await fetch(url, {
+    cache: "no-store"
+  });
+
+  if (!res.ok) {
+    throw new Error(
+      `${symbol}: HTTP ${res.status}`
+    );
+  }
+
+  const klines = await res.json();
+
+  if (!Array.isArray(klines) || klines.length === 0) {
+    throw new Error(
+      `${symbol}: kline verisi yok`
+    );
+  }
+
+  /*
+    Binance kline dizisi:
+    [0] open time
+    [4] close
+    [6] close time
+
+    Son mumun close time'ı henüz gelmediyse
+    son mum açık gündür ve history içine
+    dahil ETMİYORUZ.
+  */
+  const now = Date.now();
+
+  const closedKlines =
+    klines.filter(
+      k => Number(k[6]) < now
+    );
+
+  const closes =
+    closedKlines
+      .map(k => Number(k[4]))
+      .filter(Number.isFinite);
+
+  if (closes.length < 35) {
+    throw new Error(
+      `${symbol}: yeterli günlük veri yok`
+    );
+  }
+
+  macdHistory[symbol] = closes;
+
+  return closes;
+}
+
+/* ------------------------------------------------------------
+   Canlı MACD hesapla
+------------------------------------------------------------ */
+
+function calculateLiveMACD(symbol, currentPrice) {
+  const history = macdHistory[symbol];
+
+  if (!history ||
+      history.length < 35 ||
+      !Number.isFinite(currentPrice)) {
+    return NaN;
+  }
+
+  /*
+    Çok önemli:
+
+    history = yalnızca KAPANMIŞ günlük mumlar
+
+    currentPrice = BUGÜNÜN açık günlük mumunun
+                   anlık close değeri
+
+    Bu yüzden son kapanmış mumu değiştirmiyoruz.
+    Yeni açık günün fiyatını sona EKLİYORUZ.
+  */
+  const values =
+    history.concat([currentPrice]);
+
+  return computeMACD(values).histogram;
+}
+
+/* ------------------------------------------------------------
+   Coin listesini al
+------------------------------------------------------------ */
+
+async function loadCoinList() {
+  try {
+    setStatus("Binance coin listesi alınıyor...");
+
+    const res = await fetch(
+      `${API_BASE}/api/v3/exchangeInfo`,
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) {
+      throw new Error(
+        `exchangeInfo HTTP ${res.status}`
+      );
+    }
+
+    const data = await res.json();
+
+    /*
+      Sadece spot USDT + TRADING.
+    */
+    coinList = [
+      ...new Set(
+        data.symbols
+          .filter(s =>
+            s.symbol.endsWith("USDT") &&
+            s.status === "TRADING" &&
+            s.isSpotTradingAllowed !== false
+          )
+          .map(s => s.baseAsset)
+      )
+    ].sort(
+      (a, b) =>
+        a.localeCompare(
+          b,
+          "en",
+          { numeric: true }
+        )
+    );
+
+    setStatus(
+      `${coinList.length} coin bulundu. Fiyatlar alınıyor...`
+    );
+
+    await loadInitialPrices();
+
+  } catch (err) {
+    console.error(err);
+    setStatus(
+      "Coin listesi alınamadı: " +
+      err.message
+    );
+  }
+}
+
+/* ------------------------------------------------------------
+   İlk fiyatları tek REST çağrısıyla al
+------------------------------------------------------------ */
+
+async function loadInitialPrices() {
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/v3/ticker/price`,
+      { cache: "no-store" }
+    );
+
+    if (!res.ok) {
+      throw new Error(
+        `ticker/price HTTP ${res.status}`
+      );
+    }
+
+    const data = await res.json();
+
+    const priceMap = new Map(
+      data.map(x => [
+        x.symbol,
+        Number(x.price)
+      ])
+    );
+
+    for (const symbol of coinList) {
+      const price =
+        priceMap.get(symbol + "USDT");
+
+      if (Number.isFinite(price)) {
+        livePrices[symbol] = price;
+      }
+    }
+
+    renderTable();
+
+    await loadAllHistories();
+
+  } catch (err) {
+    console.error(err);
+    setStatus(
+      "Fiyat verisi alınamadı: " +
+      err.message
+    );
+  }
+}
+
+/* ------------------------------------------------------------
+   Kontrollü paralel REST yükleme
+   Binance rate limitini zorlamamak için.
+------------------------------------------------------------ */
+
+async function loadAllHistories() {
+  const queue = coinList.slice();
+  let loaded = 0;
+  let failed = 0;
+
+  async function worker() {
+    while (queue.length) {
+      const symbol = queue.shift();
+
+      try {
+        await loadMACDHistory(symbol);
+        loaded++;
+
+      } catch (err) {
+        failed++;
+        console.warn(err.message);
+      }
+
+      const row = tableRows.get(symbol);
+
+      if (row) {
+        updateRowMACD(symbol, row);
+      }
+
+      if (
+        loaded + failed === coinList.length ||
+        (loaded + failed) % 20 === 0
+      ) {
+        setStatus(
+          `Günlük MACD hazırlanıyor: ` +
+          `${loaded + failed}/${coinList.length}`
+        );
+      }
+    }
+  }
+
+  const workers = [];
+
+  for (
+    let i = 0;
+    i < Math.min(
+      REST_CONCURRENCY,
+      coinList.length
+    );
+    i++
+  ) {
+    workers.push(worker());
+  }
+
+  await Promise.all(workers);
+
+  setStatus(
+    `MACD hazır • ${loaded} coin • ` +
+    `${failed} veri alınamadı • Canlı bağlantı kuruluyor...`
+  );
+
+  connectKlineWebSocket();
+}
+
+/* ------------------------------------------------------------
+   Tablo
+------------------------------------------------------------ */
+
+function renderTable() {
+  tableBody.innerHTML = "";
+  tableRows.clear();
+
+  coinList.forEach(
+    (symbol, index) => {
+
+      const row =
+        document.createElement("tr");
+
+      row.dataset.symbol = symbol;
+
+      row.innerHTML = `
+        <td>
+          <input
+            type="checkbox"
+            class="favorite-checkbox"
+            ${favorites[symbol] ? "checked" : ""}
+            onchange="toggleFavorite('${symbol}', this.checked)"
+          >
+        </td>
+
+        <td class="rank">
+          ${index + 1}
+        </td>
+
+        <td class="coin-name">
+          <a
+            href="https://www.binance.com/en-TR/trade/${symbol}_USDT"
+            target="_blank"
+            rel="noopener noreferrer"
+          >${symbol}</a>
+
+          <a
+            href="https://tr.tradingview.com/chart/8tydse0K/?symbol=BINANCE%3A${symbol}USDT"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="chart-emoji"
+          >📈</a>
+        </td>
+
+        <td class="macd">…</td>
+      `;
+
+      tableBody.appendChild(row);
+
+      tableRows.set(symbol, row);
+
+      updateRowMACD(symbol, row);
+    }
+  );
+
+  applyAllFilters();
+}
+
+/* ------------------------------------------------------------
+   Satır MACD güncelle
+------------------------------------------------------------ */
+
+function updateRowMACD(symbol, row) {
+  if (!row) {
+    row = tableRows.get(symbol);
+  }
+
+  if (!row) return;
+
+  const cell =
+    row.querySelector(".macd");
+
+  if (!cell) return;
+
+  const price =
+    livePrices[symbol];
+
+  const histogram =
+    calculateLiveMACD(
+      symbol,
+      price
+    );
+
+  updateMACDCell(
+    cell,
+    histogram
+  );
+}
+
+/* ------------------------------------------------------------
+   Favoriler
+------------------------------------------------------------ */
+
+function toggleFavorite(
+  symbol,
+  checked
+) {
+  favorites[symbol] = checked;
+
+  localStorage.setItem(
+    "favorites",
+    JSON.stringify(favorites)
+  );
+
+  applyAllFilters();
+}
+
+function applyAllFilters() {
+  const onlyFavorites =
+    document.getElementById(
+      "favoriteFilter"
+    ).checked;
+
+  const searchTerm =
+    document.getElementById(
+      "coinSearch"
+    ).value
+    .trim()
+    .toLowerCase();
+
+  let visibleIndex = 1;
+
+  tableBody
+    .querySelectorAll("tr")
+    .forEach(row => {
+
+      const symbol =
+        row.dataset.symbol;
+
+      const matchesSearch =
+        !searchTerm ||
+        symbol
+          .toLowerCase()
+          .includes(searchTerm);
+
+      const matchesFavorite =
+        !onlyFavorites ||
+        !!favorites[symbol];
+
+      const visible =
+        matchesSearch &&
+        matchesFavorite;
+
+      row.style.display =
+        visible ? "" : "none";
+
+      if (visible) {
+        row.querySelector(".rank")
+          .textContent = visibleIndex++;
+      }
+    });
+}
+
+function searchCoin() {
+  applyAllFilters();
+}
+
+/* ------------------------------------------------------------
+   Sıralama
+------------------------------------------------------------ */
+
+function sortTable(col) {
+  const rows =
+    Array.from(
+      tableBody.querySelectorAll("tr")
+    );
+
+  if (
+    currentSort.col === col
+  ) {
+    currentSort.asc =
+      !currentSort.asc;
+  } else {
+    currentSort.col = col;
+    currentSort.asc = true;
+  }
+
+  const multiplier =
+    currentSort.asc ? 1 : -1;
+
+  rows.sort((a, b) => {
+
+    let x;
+    let y;
+
+    if (col === 2) {
+      x =
+        a.dataset.symbol || "";
+      y =
+        b.dataset.symbol || "";
+
+      return (
+        x.localeCompare(
+          y,
+          "en",
+          { numeric: true }
+        ) * multiplier
+      );
+    }
+
+    if (col === 3) {
+      x =
+        Number.parseFloat(
+          a.querySelector(".macd")
+            .textContent
+        );
+
+      y =
+        Number.parseFloat(
+          b.querySelector(".macd")
+            .textContent
+        );
+
+      if (!Number.isFinite(x)) x = 0;
+      if (!Number.isFinite(y)) y = 0;
+
+      return (
+        (x - y) * multiplier
+      );
+    }
+
+    return 0;
+  });
+
+  rows.forEach(row =>
+    tableBody.appendChild(row)
+  );
+
+  applyAllFilters();
+}
+
+/* ------------------------------------------------------------
+   Binance 1d Kline WebSocket
+------------------------------------------------------------
+
+   stream:
+      <symbol>@kline_1d
+
+   Binance bu akışta günün açık mumundaki
+   güncel close değerini gönderir.
+
+   Böylece ticker fiyatı ile ayrı bir hesap yapmaya
+   gerek kalmaz; doğrudan günlük mumun close alanı
+   MACD hesabında kullanılır.
+------------------------------------------------------------ */
+
+function connectKlineWebSocket() {
+  if (
+    socket &&
+    (
+      socket.readyState === WebSocket.OPEN ||
+      socket.readyState === WebSocket.CONNECTING
+    )
+  ) {
+    return;
+  }
+
+  if (reconnectTimer) {
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  }
+
+  const streams =
+    coinList
+      .map(
+        symbol =>
+          `${symbol.toLowerCase()}usdt@kline_1d`
+      )
+      .join("/");
+
+  if (!streams) return;
+
+  const url =
+    `${WS_BASE}?streams=${streams}`;
+
+  try {
+    socket =
+      new WebSocket(url);
+  } catch (err) {
+    console.error(err);
+    scheduleReconnect();
+    return;
+  }
+
+  socket.onopen = () => {
+    setStatus(
+      "🟢 Canlı bağlantı aktif • Günlük MACD gerçek zamanlı güncelleniyor"
+    );
+  };
+
+  socket.onmessage = event => {
+
+    try {
+      const message =
+        JSON.parse(event.data);
+
+      const k =
+        message?.data?.k;
+
+      if (!k) return;
+
+      const symbol =
+        String(k.s)
+          .replace(/USDT$/, "");
+
+      /*
+        k.c = o anki günlük mumun close değeri.
+
+        Bu değer gün içinde değişir.
+      */
+      const currentClose =
+        Number(k.c);
+
+      if (!Number.isFinite(currentClose)) {
+        return;
+      }
+
+      livePrices[symbol] =
+        currentClose;
+
+      const row =
+        tableRows.get(symbol);
+
+      if (row) {
+        updateRowMACD(
+          symbol,
+          row
+        );
+      }
+
+    } catch (err) {
+      console.error(
+        "WebSocket veri hatası:",
+        err
+      );
+    }
+  };
+
+  socket.onerror = err => {
+    console.warn(
+      "WebSocket hata:",
+      err
+    );
+  };
+
+  socket.onclose = () => {
+    setStatus(
+      "🟠 Canlı bağlantı kapandı • Yeniden bağlanıyor..."
+    );
+
+    socket = null;
+    scheduleReconnect();
+  };
+}
+
+function scheduleReconnect() {
+  if (reconnectTimer) return;
+
+  reconnectTimer =
+    setTimeout(() => {
+      reconnectTimer = null;
+
+      connectKlineWebSocket();
+
+    }, 5000);
+}
+
+/* ------------------------------------------------------------
+   Gün değişiminde REST geçmişini tazele
+------------------------------------------------------------
+
+   Yeni gün başladığında artık önceki açık mum
+   kapanmıştır. Bu yüzden periyodik kontrol yapıp
+   geçmişi yeniden yüklüyoruz.
+
+   10 dakikada bir kontrol yeterlidir.
+------------------------------------------------------------ */
+
+setInterval(async () => {
+
+  if (!coinList.length) return;
+
+  try {
+    const now =
+      new Date();
+
+    /*
+      Sadece günü değiştirince yeniden yüklemek
+      yerine her 10 dakikada bir ilk coin üzerinden
+      açık/kapanmış mum kontrolü yapıyoruz.
+    */
+
+    const sample =
+      coinList.find(
+        s => macdHistory[s]
+      );
+
+    if (!sample) return;
+
+    const url =
+      `${API_BASE}/api/v3/klines` +
+      `?symbol=${encodeURIComponent(sample)}USDT` +
+      `&interval=1d&limit=2`;
+
+    const res =
+      await fetch(
+        url,
+        { cache: "no-store" }
+      );
+
+    if (!res.ok) return;
+
+    const klines =
+      await res.json();
+
+    if (!Array.isArray(klines) ||
+        klines.length < 2) {
+      return;
+    }
+
+    const last =
+      klines[klines.length - 1];
+
+    const previous =
+      klines[klines.length - 2];
+
+    const lastIsClosed =
+      Number(last[6]) < Date.now();
+
+    /*
+      Son mum kapandıysa bütün geçmişi
+      güncellemek gerekir.
+    */
+    if (lastIsClosed) {
+      setStatus(
+        "Yeni günlük mum algılandı • MACD geçmişi yenileniyor..."
+      );
+
+      await loadAllHistories();
+    }
+
+  } catch (err) {
+    console.warn(
+      "Gün değişimi kontrolü:",
+      err
+    );
+  }
+
+}, 10 * 60 * 1000);
+
+/* ------------------------------------------------------------
+   Başlat
+------------------------------------------------------------ */
+
+loadCoinList();
+
+</script>
+</body>
+</html>
